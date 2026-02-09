@@ -144,7 +144,6 @@ interface VideoCardProps {
 function VideoCard({ video, isActive }: VideoCardProps) {
   const videoRef = useRef<ReactPlayerClass | null>(null);
   const { getVideo } = useVideo();
-  const [isVertical, setIsVertical] = useState(false);
   const [cards, setCards] = useState<CardData[]>([]);
   const [currentTime, setCurrentTime] = useState(0);
   const [activeCard, setActiveCard] = useState<CardData | null>(null);
@@ -190,32 +189,19 @@ function VideoCard({ video, isActive }: VideoCardProps) {
 
   return (
     <div className="h-screen w-full snap-start relative flex items-center justify-center bg-black">
-      {/* Video Player */}
-      <div className={`relative ${isVertical ? "h-full w-auto" : "w-full h-auto"}`}>
+      {/* Video Player - Always 9:16 full screen */}
+      <div className="absolute inset-0 flex items-center justify-center">
         <ReactPlayer
           ref={videoRef}
           url={video.videoLink}
-          width={isVertical ? "auto" : "100%"}
-          height={isVertical ? "100%" : "auto"}
+          width="100%"
+          height="100%"
           playing={isActive}
           loop
           muted={!isActive}
           playsinline
           onProgress={handleProgress}
           progressInterval={500}
-          onReady={() => {
-            if (videoRef.current) {
-              const player = videoRef.current.getInternalPlayer();
-              if (player && player.videoWidth && player.videoHeight) {
-                setIsVertical(player.videoHeight > player.videoWidth);
-              }
-              setTimeout(() => {
-                if (player && player.videoWidth && player.videoHeight) {
-                  setIsVertical(player.videoHeight > player.videoWidth);
-                }
-              }, 500);
-            }
-          }}
           config={{
             youtube: { playerVars: { rel: 0, modestbranding: 1, controls: 0 } },
             file: {

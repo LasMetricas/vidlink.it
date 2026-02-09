@@ -25,11 +25,11 @@ const Step3Cards = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [isVertical, setIsVertical] = useState(false);
 
-  // New card form
+  // New card form - default to 0:01 for first card engagement
   const [cardName, setCardName] = useState("");
   const [cardLink, setCardLink] = useState("");
-  const [cardStart, setCardStart] = useState(0);
-  const [startTxt, setStartTxt] = useState("00:00");
+  const [cardStart, setCardStart] = useState(1);
+  const [startTxt, setStartTxt] = useState("00:01");
 
   const maxTime = Number(process.env.NEXT_PUBLIC_MAX_TIME || 240);
 
@@ -125,6 +125,12 @@ const Step3Cards = () => {
   const handleNext = () => {
     if (cards.length === 0) {
       return errorModal("Please add at least one card to your video.");
+    }
+
+    // Check that at least one card starts at 0:01 or earlier for immediate engagement
+    const hasEarlyCard = cards.some((card) => card.start <= 1);
+    if (!hasEarlyCard) {
+      return errorModal("Your first card must appear at 0:01 or earlier to engage viewers immediately.");
     }
 
     setUploadData({ cards, step: 4 });
@@ -284,10 +290,17 @@ const Step3Cards = () => {
         <div className="flex-1 min-w-[280px]">
           <h3 className="font-semibold mb-4">Cards ({cards.length})</h3>
 
+          {/* Requirement hint */}
+          <div className="bg-blue/10 border border-blue/30 rounded-[10px] p-3 mb-4">
+            <p className="text-[13px] text-blue">
+              <strong>Tip:</strong> Your first card must appear at <strong>0:01</strong> to engage viewers immediately.
+            </p>
+          </div>
+
           {cards.length === 0 ? (
             <div className="text-center text-[#888] py-10 bg-[#1E1E1E] rounded-[15px]">
               <p>No cards added yet.</p>
-              <p className="text-[14px] mt-2">Play the video and add cards at specific moments.</p>
+              <p className="text-[14px] mt-2">Add your first card at 0:01 to start!</p>
             </div>
           ) : (
             <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">

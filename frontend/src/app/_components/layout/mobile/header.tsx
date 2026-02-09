@@ -56,6 +56,9 @@ const HeaderMobile = () => {
     }
   }, [isOpenMenu]);
 
+  // Don't show on home page - mobile home has its own header
+  if (pathName === "/") return null;
+
   if (loading) return <></>;
   return !isOpenMenu ? (
     // Closed header
