@@ -115,6 +115,7 @@ export default function HomeMobile() {
               key={video._id}
               video={video}
               isActive={index === currentIndex}
+              isAuth={isAuth}
             />
           ))}
         </div>
@@ -139,16 +140,18 @@ export default function HomeMobile() {
 interface VideoCardProps {
   video: VideoData;
   isActive: boolean;
+  isAuth: boolean;
 }
 
-function VideoCard({ video, isActive }: VideoCardProps) {
+function VideoCard({ video, isActive, isAuth }: VideoCardProps) {
   const videoRef = useRef<ReactPlayerClass | null>(null);
-  const { getVideo } = useVideo();
+  const { getVideo, saveCard } = useVideo();
   const [cards, setCards] = useState<CardData[]>([]);
   const [currentTime, setCurrentTime] = useState(0);
   const [activeCard, setActiveCard] = useState<CardData | null>(null);
   const [cardsFetched, setCardsFetched] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [savedCards, setSavedCards] = useState<Set<string>>(new Set());
 
   // Fetch cards when video becomes active
   useEffect(() => {
@@ -157,6 +160,12 @@ function VideoCard({ video, isActive }: VideoCardProps) {
         const res = await getVideo(video._id);
         if ("videoInfo" in res && res.videoInfo?.cards) {
           setCards(res.videoInfo.cards);
+          // Initialize saved cards from API
+          const saved = new Set<string>();
+          res.videoInfo.cards.forEach((card) => {
+            if (card.isSaved) saved.add(card._id);
+          });
+          setSavedCards(saved);
         }
         setCardsFetched(true);
       };
@@ -236,26 +245,54 @@ function VideoCard({ video, isActive }: VideoCardProps) {
         />
       </div>
 
-      {/* Floating Card Overlay */}
+      {/* Floating Card Overlay - Simple Square */}
       {activeCard && (
-        <a
-          href={activeCard.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute bottom-[180px] left-4 right-4 z-30 animate-in fade-in slide-in-from-bottom-4 duration-300"
-        >
-          <div className="bg-black/80 backdrop-blur-md rounded-[14px] p-4 flex items-center justify-between border border-white/10">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <span className="w-8 h-8 rounded-full bg-blue flex-shrink-0 flex items-center justify-center text-[14px] font-bold">
+        <div className="absolute bottom-[160px] left-4 z-30 animate-in fade-in slide-in-from-left-4 duration-300">
+          <div className="relative">
+            {/* Main Card - Tap to visit link */}
+            <a
+              href={activeCard.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-[120px] h-[120px] bg-gradient-to-br from-blue to-blue/70 rounded-[16px] p-3 flex flex-col justify-between shadow-lg"
+            >
+              <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-[12px] font-bold">
                 {activeCard.no}
               </span>
-              <span className="font-semibold text-[15px] truncate">{activeCard.name}</span>
-            </div>
-            <div className="bg-blue px-4 py-2 rounded-[8px] text-[13px] font-semibold flex-shrink-0 ml-3">
-              Visit
-            </div>
+              <div>
+                <p className="text-[13px] font-semibold leading-tight line-clamp-2">{activeCard.name}</p>
+                <p className="text-[10px] text-white/70 mt-1">Tap to visit</p>
+              </div>
+            </a>
+            {/* Save Button */}
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (!isAuth) {
+                  sessionStorage.setItem("vidlink_return_url", "/");
+                  window.location.href = "/login";
+                  return;
+                }
+                if (activeCard._id && !savedCards.has(activeCard._id)) {
+                  await saveCard(activeCard._id);
+                  setSavedCards(new Set([...savedCards, activeCard._id]));
+                }
+              }}
+              className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-md ${
+                savedCards.has(activeCard._id) ? "bg-blue" : "bg-white"
+              }`}
+            >
+              <svg
+                className={`w-4 h-4 ${savedCards.has(activeCard._id) ? "text-white" : "text-black"}`}
+                fill={savedCards.has(activeCard._id) ? "currentColor" : "none"}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+            </button>
           </div>
-        </a>
+        </div>
       )}
 
       {/* Video Info Overlay */}
