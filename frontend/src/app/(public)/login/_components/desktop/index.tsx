@@ -71,12 +71,7 @@ const LoginDesktop = () => {
     <>
       <main className="h-screen flex items-center justify-center">
         <div className="h-full w-full fixed left-0 top-0 -z-10">
-          {process.env.NEXT_PUBLIC_PRODUCTION === "production" ? (
-            // <Video src="https://s3-figma-videos-production-sig.figma.com/video/1393144935889806437/TEAM/9fe5/9459/-c108-493f-88a8-fcd10d3d4970?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=hHgGoRtCZGaKElyVbPFg0ik8pDoucX1nTEg1DK2kHG2zgLsDgMbqYJ8YQqFGiR5mtCCGnLCUK6BdgBtM6j6JV8jwdDN87vEYJMMAmC4T~OjfoRgCc7XhVUR4eCXdlfm6SNAd7vmoGoh~4CZRgM8zGUnbJ2oCXYCOWKGbmWUYFjJl0lL7UR7NqhFsWmZuNVLbtDeLYJOb2mCWSMzUGa2l5G8LoiGIoGJCOxtvrcZYVS8O9uDWHVG8TloBTxWDgt1EWhzV65EY46Wa8nAQzkob3Z6EjKIx8dccF~iyIF2Vf4tvAiCkBrn2tQkUGH3z-8JQiQwakRCg641y60S-bX5DuA__" />
-            <Video src="/video/sign.mp4" />
-          ) : (
-            <Video src="/video/home2.mp4" />
-          )}
+          <Video src="/video/main.mp4" />
         </div>
         <div className="mb-[34px] flex flex-col gap-[62px] items-center font-sans">
           <h1

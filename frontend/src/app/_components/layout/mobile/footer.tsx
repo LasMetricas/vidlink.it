@@ -53,10 +53,15 @@ const FooterMobile = ({ isFixed }: { isFixed: boolean }) => {
           <Link href={"/"}>
             <img src="/icon/layout/title.svg" alt="" />
           </Link>
-          <div className="flex items-center gap-[5px]">
-            <p className="text-[12px]">A TOOL BY FALCA</p>
-            <img src="/icon/layout/falca.png" alt="" className="h-[12px]" />
-          </div>
+          <a
+            href="https://www.falca.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-[5px] hover:underline"
+          >
+            <p className="text-[14px] font-semibold">POWERED BY FALCA</p>
+            <img src="/icon/layout/falca.png" alt="" className="h-[14px]" />
+          </a>
         </div>
         <div className="flex flex-col items-end justify-between text-[6px] h-[41px]">
           <p className="">DID YOU DETECT A BUG?</p>

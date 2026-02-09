@@ -40,7 +40,14 @@ const HeaderDesktop = () => {
             alt=""
           />
         </Link>
-        <p className=" uppercase text-[12px]">powered by falca</p>
+        <a
+          href="https://www.falca.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="uppercase text-[14px] font-semibold hover:underline"
+        >
+          powered by falca
+        </a>
       </div>
       {isAuth ? (
         <div className="flex items-center gap-[50px] ">
