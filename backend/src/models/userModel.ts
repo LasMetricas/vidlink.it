@@ -37,7 +37,7 @@ const UserSchema = new Schema<IUser>(
     name: { type: String, required: true },
     picture: { type: String, required: true },
     gender: { type: String, enum: ["male", "female", "other", ""] },
-    bio: { type: String, fdefault: "" },
+    bio: { type: String, default: "" },
     instagram: { type: String, default: "" },
     tiktok: { type: String, default: "" },
     youtube: { type: String, default: "" },

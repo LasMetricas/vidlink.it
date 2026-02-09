@@ -12,7 +12,7 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
     return res;
   }
 
-  const jwtSecret = process.env.NEXT_PUBLIC_JWT_SECRET;
+  const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret || typeof jwtSecret !== "string") {
     throw new Error("JWT_SECRET is not defined or is not a string");
   }

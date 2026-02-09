@@ -44,4 +44,5 @@ export const saveVideoS3 = async (
       throw new Error("Failed to upload video to S3");
     }
   }
+  return finalVideoLink;
 };

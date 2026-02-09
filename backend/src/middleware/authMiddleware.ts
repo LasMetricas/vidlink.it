@@ -24,17 +24,6 @@ const authMiddleware = expressAsyncHandler(
       req.userId = decoded.userId;
       next();
     } catch (error) {
-      if (
-        (req.method === "GET" && req.path === "/getvideos/") ||
-        (req.method === "GET" && req.path === "/gethomevideos/") ||
-        (req.method === "GET" && req.path === "/getvideo/") ||
-        (req.method === "GET" && req.path === "/getuservideos/") ||
-        (req.method === "PUT" && req.path === "/increaseclicks/") ||
-        (req.method === "PUT" && req.path === "/watchtime/")
-      ) {
-        next();
-        return;
-      }
       res.status(401).json({ message: "Token is invalid or has expired!" });
     }
   }

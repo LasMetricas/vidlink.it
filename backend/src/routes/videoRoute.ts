@@ -1,5 +1,6 @@
 import express from "express";
 import authMiddleware from "../middleware/authMiddleware";
+import optionalAuthMiddleware from "../middleware/optionalAuthMiddleware";
 import {
   checkUserName,
   publishVideo,
@@ -34,15 +35,15 @@ const videoRoutes = express.Router();
 
 videoRoutes.route("/publish").post(authMiddleware, publishVideo);
 videoRoutes.route("/delete").delete(authMiddleware, deleteVideo);
-videoRoutes.route("/getvideos").get(authMiddleware, getVideos);
-videoRoutes.route("/gethomevideos").get(authMiddleware, getHomeVideos);
-videoRoutes.route("/getvideo").get(authMiddleware, getVideo);
+videoRoutes.route("/getvideos").get(optionalAuthMiddleware, getVideos);
+videoRoutes.route("/gethomevideos").get(optionalAuthMiddleware, getHomeVideos);
+videoRoutes.route("/getvideo").get(optionalAuthMiddleware, getVideo);
 videoRoutes.route("/geteditvideo").get(authMiddleware, getEditVideo);
 videoRoutes.route("/getmyvideo").get(authMiddleware, getMyVideo);
 videoRoutes.route("/addlike").put(authMiddleware, addLike);
 videoRoutes.route("/getmyvideos").get(authMiddleware, getMyVideos);
 videoRoutes.route("/getcards").get(authMiddleware, getCards);
-videoRoutes.route("/getuservideos").get(authMiddleware, getUserVideos);
+videoRoutes.route("/getuservideos").get(optionalAuthMiddleware, getUserVideos);
 videoRoutes.route("/followuser").put(authMiddleware, followUser);
 videoRoutes.route("/getuserinfo").get(authMiddleware, getUserInfo);
 videoRoutes
@@ -52,8 +53,8 @@ videoRoutes.route("/checkusername").post(authMiddleware, checkUserName);
 videoRoutes.route("/getusername").get(authMiddleware, getUserName);
 videoRoutes.route("/getusername").get(authMiddleware, getUserName);
 videoRoutes.route("/savecard").put(authMiddleware, saveCard);
-videoRoutes.route("/increaseclicks").put(authMiddleware, increaseClicks);
-videoRoutes.route("/watchtime").put(authMiddleware, watchTime);
+videoRoutes.route("/increaseclicks").put(optionalAuthMiddleware, increaseClicks);
+videoRoutes.route("/watchtime").put(optionalAuthMiddleware, watchTime);
 videoRoutes
   .route("/storevideofile")
   .post(authMiddleware, upload.single("file"), storeVideoFile);
