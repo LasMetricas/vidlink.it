@@ -38,11 +38,7 @@ export default function HomeMobile() {
     <>
       <div className=" relative">
         <div className="h-screen">
-          {process.env.NEXT_PUBLIC_PRODUCTION === "production" ? (
-            <Video src="/video/main.mp4" />
-          ) : (
-            <Video src="/video/home.mp4" />
-          )}
+          <Video src="/video/main.mp4" />
         </div>
         <div className="absolute top-[332px] w-full flex justify-center">
           <div>
@@ -86,11 +82,7 @@ export default function HomeMobile() {
         <div className="flex justify-center items-center  border-white border-[2px] rounded-[9.42px] w-full h-[574px] relative overflow-hidden">
           {isPlay && (
             <div className="h-[574px] w-full">
-              {process.env.NEXT_PUBLIC_PRODUCTION === "production" ? (
-                <Video src="/video/main.mp4" />
-              ) : (
-                <Video src="/video/home/home.mp4" />
-              )}
+              <Video src="/video/main.mp4" />
             </div>
           )}
           {isPlay || (

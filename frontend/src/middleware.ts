@@ -36,7 +36,6 @@ export const config = {
   matcher: [
     "/profile",
     "/settings",
-    "/upload/:path*",
     "/dashboard",
     "/myvideo/:path*",
     "/draft",
