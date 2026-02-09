@@ -1,0 +1,40 @@
+export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+// auth urls
+export const SIGNUP = `${BASE_URL}/express/customauth/register/`; // sign up user
+export const SIGNIN = `${BASE_URL}/express/customauth/login/`; // sign in user
+//videos urls
+export const PUBLISHVIDEO = `${BASE_URL}/express/video/publish/`; // video publish
+export const DELETEVIDEO = `${BASE_URL}/express/video/delete/`; // video delete
+export const GETVIDEOS = `${BASE_URL}/express/video/getvideos/`; // get videos
+export const GETHOMEVIDEOS = `${BASE_URL}/express/video/gethomevideos/`; // get homepage videos
+export const GETVIDEO = `${BASE_URL}/express/video/getvideo/`; // get a video
+export const GETEDITVIDEO = `${BASE_URL}/express/video/geteditvideo/`; // get a edit video
+export const GETMYVIDEO = `${BASE_URL}/express/video/getmyvideo/`; // get my video
+export const ADDLIKE = `${BASE_URL}/express/video/addlike/`; // get video
+export const RECORDWATCHTIME = `${BASE_URL}/express/video/recordwatchtime/`; // record watchtime
+export const GETMYVIDEOS = `${BASE_URL}/express/video/getmyvideos/`; // get my videos
+export const GETCARDS = `${BASE_URL}/express/video/getcards/`; // get cards
+export const GETUSERVIDEOS = `${BASE_URL}/express/video/getuservideos/`; // get user's videos
+export const FOLLOWUSER = `${BASE_URL}/express/video/followuser/`; // follow user
+export const GETUSERINFO = `${BASE_URL}/express/video/getuserinfo/`; // get user info
+export const SETUSERINFO = `${BASE_URL}/express/video/setuserinfo/`; // set user info
+export const CHECKUSERNAME = `${BASE_URL}/express/video/checkusername/`; // check username
+export const GETUSERNAME = `${BASE_URL}/express/video/getusername/`; // get username
+export const SAVECARD = `${BASE_URL}/express/video/savecard/`; // save card
+export const INCREASECLICKS = `${BASE_URL}/express/video/increaseclicks/`; // increase card clicks
+export const WATCHTIME = `${BASE_URL}/express/video/watchtime/`; // watch time record
+export const GETDATACREATOR = `${BASE_URL}/express/data/getdatacreator/`; // get data as a creator
+export const GETDATAVIEWER = `${BASE_URL}/express/data/getdataviewer/`; // get data as a viewer
+export const GETDATAADMIN = `${BASE_URL}/express/admin/getdataadmin/`; // get data as a admin
+export const HANDLEUSERSTATUS = `${BASE_URL}/express/admin/handleuserstatus/`; // handle user status
+export const STOREVIDOEFILE = `${BASE_URL}/express/video/storevideofile/`; // get data as a viewer
+export const SAVEDRAFT = `${BASE_URL}/express/draft/savedraft/`; // save draft video
+export const GETDRAFT = `${BASE_URL}/express/draft/getdraft/`; // get draft video
+export const DELETEDRAFT = `${BASE_URL}/express/draft/deletedraft/`; // delete draft video
+export const GETDRAFTS = `${BASE_URL}/express/draft/getdrafts/`; // get drafts videos
+// error logging urls
+export const LOGERROR = `${BASE_URL}/express/errors/log/`; // log frontend error
+export const GETERRORS = `${BASE_URL}/express/errors/get/`; // get frontend errors (admin)
+export const GETERRORSTATS = `${BASE_URL}/express/errors/stats/`; // get error statistics (admin)
+export const RESOLVEERROR = `${BASE_URL}/express/errors/resolve/`; // resolve error (admin)
+export const DELETEERROR = `${BASE_URL}/express/errors/delete/`; // delete error (admin)
