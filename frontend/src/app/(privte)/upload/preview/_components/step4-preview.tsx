@@ -32,6 +32,7 @@ const Step4Preview = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [activeCard, setActiveCard] = useState<CardType | null>(null);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isVertical, setIsVertical] = useState(false);
 
   useEffect(() => {
     const data = getUploadData();
@@ -204,8 +205,8 @@ const Step4Preview = () => {
 
       <div className="flex flex-wrap gap-[40px]">
         {/* Video Player with Card Overlay */}
-        <div className="w-full max-w-[600px] mx-auto lg:mx-0">
-          <div className="relative aspect-video rounded-[15px] overflow-hidden bg-[#1E1E1E]">
+        <div className={`mx-auto lg:mx-0 ${isVertical ? "w-[320px]" : "w-full max-w-[600px]"}`}>
+          <div className={`relative rounded-[15px] overflow-hidden bg-[#1E1E1E] ${isVertical ? "aspect-[9/16]" : "aspect-video"}`}>
             <ReactPlayer
               ref={videoRef}
               url={videoLink}
@@ -216,6 +217,27 @@ const Step4Preview = () => {
               onProgress={onProgress}
               onPlay={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
+              onReady={() => {
+                if (videoRef.current) {
+                  const player = videoRef.current.getInternalPlayer();
+                  if (player && player.videoWidth && player.videoHeight) {
+                    setIsVertical(player.videoHeight > player.videoWidth);
+                  }
+                  setTimeout(() => {
+                    if (player && player.videoWidth && player.videoHeight) {
+                      setIsVertical(player.videoHeight > player.videoWidth);
+                    }
+                  }, 500);
+                }
+              }}
+              config={{
+                youtube: { playerVars: { rel: 0, modestbranding: 1 } },
+                file: {
+                  attributes: {
+                    style: { width: "100%", height: "100%", objectFit: "contain" },
+                  },
+                },
+              }}
             />
             {/* Active Card Overlay */}
             {activeCard && (

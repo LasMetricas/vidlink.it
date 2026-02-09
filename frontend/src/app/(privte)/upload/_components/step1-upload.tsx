@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import ReactPlayer from "react-player";
 import { Link, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import Footer from "@/app/_components/layout/desktop/footer";
+import { Video } from "@/app/_components/ui/video";
 import { useVideoValidate } from "@/hooks/useVideoValidate";
 import { setUploadData, getUploadData, clearUploadData } from "@/utils/uploadStorage";
 import { errorModal } from "@/utils/confirm";
@@ -94,6 +95,12 @@ const Step1Upload = () => {
 
   return (
     <>
+      {/* Background Video */}
+      <div className="h-full w-full fixed left-0 top-0 -z-10">
+        <Video src="/video/main.mp4" />
+        <div className="absolute inset-0 bg-black/60" />
+      </div>
+
       {/* Hidden player to validate link */}
       <ReactPlayer
         ref={videoRef}
@@ -110,6 +117,11 @@ const Step1Upload = () => {
       />
 
       <main className="mx-[20px] md:mx-[50px] lg:mx-[90px] pt-[100px]">
+        {/* Hero Headline */}
+        <h1 className="text-[28px] md:text-[36px] lg:text-[42px] font-bold text-center mb-[50px] max-w-[800px] mx-auto leading-tight">
+          Your video + smart cards = a richer experience for viewers, more value for you.
+        </h1>
+
         {/* Progress indicator */}
         <div className="flex items-center justify-center gap-4 mb-[60px]">
           <div className="flex items-center gap-2">

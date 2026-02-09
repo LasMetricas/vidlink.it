@@ -38,7 +38,7 @@ const Upload: React.FC<Type> = ({
   setUrl,
   cancelVideo,
   setDuration,
-  // setFile,
+  setFile,
   setTitle,
   setDescription,
   // setEditSignal,
@@ -58,30 +58,14 @@ const Upload: React.FC<Type> = ({
   const router = useRouter();
 
   const handleNext = async () => {
-    const res = await getUserName();
-    if (res.status === 200 && "userName" in res) {
-      if (res.userName.trim() === "") {
-        errorModal("You must set a username before creating your first video.");
-        Cookies.set("isUploadUrl", JSON.stringify(true), { expires: 1 });
-        return router.push("/settings");
-      }
-    } else {
-      errorModal(res.message || "Something went wrong");
-      return;
-    }
+    // Allow users to try the tool without login - auth check moved to publish step
     if (videoSrc && url) {
       return errorModal("Please input one of them.");
     } else if (videoSrc && uploadedFile) {
-      const file = new FormData();
-      file.append("file", uploadedFile);
-      const res = await storeVideoFile(file);
-      if (res.status === 200 && "videoLink" in res) {
-        setVideoLink(res.videoLink);
-        setDuration(fileDuration);
-      } else {
-        errorModal(res.message || "Something went wrong");
-        return;
-      }
+      // Use local preview for now - S3 upload happens at publish time
+      setVideoLink(videoSrc);
+      setDuration(fileDuration);
+      setFile(uploadedFile);
     } else if (url) {
       if (isValidLink === null) {
         return errorModal("Please wait for the video to load.");

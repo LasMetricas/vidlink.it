@@ -1,115 +1,310 @@
 "use client";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { basicBold } from "@/style/fonts/fonts";
-import Footer from "@/app/_components/layout/mobile/footer";
-import { useState } from "react";
-import { Video } from "../../ui/video";
-import Image from "next/image";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import dynamic from "next/dynamic";
+import type ReactPlayerClass from "react-player";
+import useVideo from "@/hooks/useVideo";
+import useVerifyAuth from "@/hooks/useVerifyAuth";
+
+const ReactPlayer = dynamic(() => import("react-player/lazy"), {
+  ssr: false,
+}) as unknown as typeof ReactPlayerClass;
+
+interface CardData {
+  _id: string;
+  link: string;
+  name: string;
+  start: number;
+  no: number;
+  isSaved: boolean;
+}
+
+interface VideoData {
+  _id: string;
+  videoLink: string;
+  title: string;
+  info: string;
+  duration: number;
+  views: number;
+  card: number;
+  user: {
+    _id: string;
+    userName: string;
+    picture: string;
+  };
+}
 
 export default function HomeMobile() {
-  const [isPlay, setIsPLay] = useState<boolean>(false);
-  const videoPlay = () => {
-    setIsPLay(true);
+  const { getHomeVideos } = useVideo();
+  const { isAuth } = useVerifyAuth();
+  const [videos, setVideos] = useState<VideoData[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      const res = await getHomeVideos();
+      if ("homeVideos" in res && res.homeVideos) {
+        setVideos(res.homeVideos as VideoData[]);
+      }
+      setLoading(false);
+    };
+    fetchVideos();
+  }, []);
+
+  const handleScroll = () => {
+    if (containerRef.current) {
+      const scrollTop = containerRef.current.scrollTop;
+      const height = window.innerHeight;
+      const newIndex = Math.round(scrollTop / height);
+      if (newIndex !== currentIndex && newIndex < videos.length) {
+        setCurrentIndex(newIndex);
+      }
+    }
   };
 
-  const settings = {
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    vertical: true,
-    autoplay: true,
-    autoplaySpeed: 1000,
-    arrows: false,
-    adaptiveHeight: true,
-  };
-  const images = [
-    { name: "youtube", src: "/icon/home/youtube.png" },
-    { name: "youtube", src: "/icon/home/max.png" },
-    { name: "youtube", src: "/icon/home/spotify.png" },
-    { name: "youtube", src: "/icon/home/wikipedia.png" },
-    { name: "youtube", src: "/icon/home/linkedin.png" },
-    { name: "youtube", src: "/icon/home/imdb.png" },
-  ];
+  if (loading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue"></div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <div className=" relative">
-        <div className="h-screen">
-          <Video src="/video/main.mp4" />
-        </div>
-        <div className="absolute top-[332px] w-full flex justify-center">
-          <div>
-            <img
-              width={356.54}
-              height={54}
-              className="w-[356.54px] h-[54px]"
-              src="/icon/home/title.png"
-              alt=""
-              loading="eager"
-            />
-            <div className="flex items-center gap-[12.87px] mt-[13px] pl-[17.54px]">
-              <h1 className="text-[15.06px] text-white">
-                CONNECT YOUR VIDEOS TO
-              </h1>
-              <Slider {...settings} className="w-[45px] ">
-                {images.map((item, index) => (
-                  <div key={index}>
-                    <Image width={28.7} height={28.7} className="pt-[2px]" src={item.src} alt="" />
-                  </div>
-                ))}
-              </Slider>
-            </div>
+    <div className="h-screen w-full bg-black overflow-hidden">
+      {/* Sticky Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent pt-2 pb-6 px-4">
+        <div className="flex justify-between items-center">
+          <img src="/icon/layout/title.svg" alt="VidLink" className="h-[20px]" />
+          <div className="flex gap-3">
+            <Link
+              href="/upload"
+              className="bg-blue text-white text-[12px] font-bold px-4 py-2 rounded-full"
+            >
+              CREATE
+            </Link>
+            <Link
+              href="/videos"
+              className="bg-white/20 text-white text-[12px] font-bold px-4 py-2 rounded-full backdrop-blur-sm"
+            >
+              WATCH
+            </Link>
+            {!isAuth && (
+              <Link
+                href="/login"
+                className="bg-white text-black text-[12px] font-bold px-4 py-2 rounded-full"
+              >
+                LOGIN
+              </Link>
+            )}
           </div>
         </div>
-        <div className=" absolute text-[10px] bottom-[37px] left-[20px] right-[20px]">
-          <h1 className="mb-[15.5px] font-bold ">POWERED BY HUMANS</h1>
-          <p className="font-normal leading-[12px] text-justify tracking-normal">
-            WE FILL VIDEOS WITH KNOWLEDGE AND ACTIONS THANKS TO OUR SYNCHRONIZED
-            CARDS. MADE FOR MOVIE LOVERS, DESIGN AFICIONADOS, ADVERTISING PROS,
-            SPORTS ANALYTICS AND FANS OF CASABLANCA...
-          </p>
-        </div>
       </div>
-      <div className="flex flex-col items-center pt-[22px] px-[15.5px]">
-        <h1
-          className={`${basicBold.className} text-[94.5px] w-full text-center max-[393px]:text-[82px]  leading-[85.39px] pb-[28px]`}
+
+      {/* Video Feed */}
+      {videos.length > 0 ? (
+        <div
+          ref={containerRef}
+          className="h-full overflow-y-scroll snap-y snap-mandatory"
+          onScroll={handleScroll}
         >
-          HOW IT WORKS
-        </h1>
-        <div className="flex justify-center items-center  border-white border-[2px] rounded-[9.42px] w-full h-[574px] relative overflow-hidden">
-          {isPlay && (
-            <div className="h-[574px] w-full">
-              <Video src="/video/main.mp4" />
-            </div>
-          )}
-          {isPlay || (
-            <button onClick={videoPlay}>
-              <img
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                src="/icon/home/play.svg"
-                alt=""
-              />
-            </button>
-          )}
+          {videos.map((video, index) => (
+            <VideoCard
+              key={video._id}
+              video={video}
+              isActive={index === currentIndex}
+            />
+          ))}
         </div>
-        <p className="text-[12px] w-full pt-[21px] px-[5px] text-justify leading-[14.4px]">
-          A tool that allows you to insert content into your favorite videos.
-          Thanks to its non intrusive design you can watch and interact or not.
-          It is easy, clear and a bit surprising. The system is absolutely safe
-          and spam free. Our team of editors curates the content and make sure
-          you don’t click where you should not.
-        </p>
-        <Link
-          href={"/videos"}
-          className="border-[1.5px] border-white rounded-[3.2px] text-[14.91px] py-[1px] px-[2.13px] my-[43px] "
+      ) : (
+        <div className="h-full flex flex-col items-center justify-center text-white">
+          <p className="text-[18px] mb-4">No videos yet</p>
+          <Link
+            href="/upload"
+            className="bg-blue px-6 py-3 rounded-full font-bold"
+          >
+            Create the first video
+          </Link>
+        </div>
+      )}
+
+      {/* Bottom gradient */}
+      <div className="fixed bottom-0 left-0 right-0 h-[100px] bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+    </div>
+  );
+}
+
+interface VideoCardProps {
+  video: VideoData;
+  isActive: boolean;
+}
+
+function VideoCard({ video, isActive }: VideoCardProps) {
+  const videoRef = useRef<ReactPlayerClass | null>(null);
+  const { getVideo } = useVideo();
+  const [isVertical, setIsVertical] = useState(false);
+  const [cards, setCards] = useState<CardData[]>([]);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [activeCard, setActiveCard] = useState<CardData | null>(null);
+  const [cardsFetched, setCardsFetched] = useState(false);
+
+  // Fetch cards when video becomes active
+  useEffect(() => {
+    if (isActive && !cardsFetched && video.card > 0) {
+      const fetchCards = async () => {
+        const res = await getVideo(video._id);
+        if ("videoInfo" in res && res.videoInfo?.cards) {
+          setCards(res.videoInfo.cards);
+        }
+        setCardsFetched(true);
+      };
+      fetchCards();
+    }
+  }, [isActive, cardsFetched, video._id, video.card]);
+
+  // Update active card based on current time
+  useEffect(() => {
+    if (cards.length === 0) {
+      setActiveCard(null);
+      return;
+    }
+
+    // Find the most recent card that should be showing
+    const currentCard = cards
+      .filter((card) => card.start <= currentTime)
+      .sort((a, b) => b.start - a.start)[0];
+
+    // Check if this card should still be visible (within 5 seconds of its start time)
+    if (currentCard && currentTime - currentCard.start <= 5) {
+      setActiveCard(currentCard);
+    } else {
+      setActiveCard(null);
+    }
+  }, [currentTime, cards]);
+
+  const handleProgress = useCallback((state: { playedSeconds: number }) => {
+    setCurrentTime(Math.floor(state.playedSeconds));
+  }, []);
+
+  return (
+    <div className="h-screen w-full snap-start relative flex items-center justify-center bg-black">
+      {/* Video Player */}
+      <div className={`relative ${isVertical ? "h-full w-auto" : "w-full h-auto"}`}>
+        <ReactPlayer
+          ref={videoRef}
+          url={video.videoLink}
+          width={isVertical ? "auto" : "100%"}
+          height={isVertical ? "100%" : "auto"}
+          playing={isActive}
+          loop
+          muted={!isActive}
+          playsinline
+          onProgress={handleProgress}
+          progressInterval={500}
+          onReady={() => {
+            if (videoRef.current) {
+              const player = videoRef.current.getInternalPlayer();
+              if (player && player.videoWidth && player.videoHeight) {
+                setIsVertical(player.videoHeight > player.videoWidth);
+              }
+              setTimeout(() => {
+                if (player && player.videoWidth && player.videoHeight) {
+                  setIsVertical(player.videoHeight > player.videoWidth);
+                }
+              }, 500);
+            }
+          }}
+          config={{
+            youtube: { playerVars: { rel: 0, modestbranding: 1, controls: 0 } },
+            file: {
+              attributes: {
+                playsInline: true,
+                style: { width: "100%", height: "100%", objectFit: "contain" },
+              },
+            },
+          }}
+        />
+      </div>
+
+      {/* Floating Card Overlay */}
+      {activeCard && (
+        <a
+          href={activeCard.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-[180px] left-4 right-4 z-30 animate-in fade-in slide-in-from-bottom-4 duration-300"
         >
-          ALL VIDEOS
+          <div className="bg-black/80 backdrop-blur-md rounded-[14px] p-4 flex items-center justify-between border border-white/10">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <span className="w-8 h-8 rounded-full bg-blue flex-shrink-0 flex items-center justify-center text-[14px] font-bold">
+                {activeCard.no}
+              </span>
+              <span className="font-semibold text-[15px] truncate">{activeCard.name}</span>
+            </div>
+            <div className="bg-blue px-4 py-2 rounded-[8px] text-[13px] font-semibold flex-shrink-0 ml-3">
+              Visit
+            </div>
+          </div>
+        </a>
+      )}
+
+      {/* Video Info Overlay */}
+      <div className="absolute bottom-[100px] left-4 right-16 z-20">
+        <Link href={`/profile/${video.user._id}`} className="flex items-center gap-2 mb-2">
+          {video.user.picture ? (
+            <img
+              src={video.user.picture}
+              alt=""
+              className="w-10 h-10 rounded-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gray-600" />
+          )}
+          <span className="font-semibold text-[14px]">{video.user.userName}</span>
+        </Link>
+        <Link href={`/videos/${video._id}`}>
+          <h3 className="text-[16px] font-bold text-blue">{video.title}</h3>
+          {video.info && <p className="text-[13px] text-white/80">{video.info}</p>}
         </Link>
       </div>
-      <Footer isFixed={false} />
-    </>
+
+      {/* Side Actions */}
+      <div className="absolute right-3 bottom-[180px] flex flex-col gap-5 z-20">
+        <Link
+          href={`/videos/${video._id}`}
+          className="flex flex-col items-center"
+        >
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+            <span className="text-[12px] font-bold">{video.card}</span>
+          </div>
+          <span className="text-[10px] mt-1">Cards</span>
+        </Link>
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+            <span className="text-[12px] font-bold">{video.views}</span>
+          </div>
+          <span className="text-[10px] mt-1">Views</span>
+        </div>
+      </div>
+
+      {/* Card count indicator - shows when no active card is displayed */}
+      {video.card > 0 && !activeCard && (
+        <div className="absolute bottom-[40px] left-4 right-4 flex justify-center z-20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2">
+            <span className="text-[12px] text-white/70">{video.card} cards in this video</span>
+          </div>
+        </div>
+      )}
+
+      {/* Tap to view full */}
+      <Link
+        href={`/videos/${video._id}`}
+        className="absolute inset-0 z-10"
+        aria-label="View video details"
+      />
+    </div>
   );
 }

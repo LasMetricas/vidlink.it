@@ -46,6 +46,7 @@ const PreviewVideo: React.FC<Type> = ({
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState<boolean>(false);
   const playingStartedRef = useRef<boolean>(false);
+  const [isVertical, setIsVertical] = useState<boolean>(false);
   // Go to selected card start time
   useEffect(() => {
     if (videoRef.current && isReady && !loading) {
@@ -168,7 +169,13 @@ const PreviewVideo: React.FC<Type> = ({
         </div>
       </div>
       {videoLink ? (
-        <div className="h-[225.42px] w-full rounded-[7.36px] overflow-hidden relative">
+        <div
+          className={`rounded-[7.36px] overflow-hidden relative bg-black ${
+            isVertical
+              ? "w-[180px] h-[320px] mx-auto"
+              : "w-full aspect-video"
+          }`}
+        >
           <ReactPlayer
             ref={videoRef}
             url={videoLink}
@@ -181,6 +188,18 @@ const PreviewVideo: React.FC<Type> = ({
             height="100%"
             onReady={() => {
               setIsReady(true);
+              // Detect video aspect ratio
+              if (videoRef.current) {
+                const player = videoRef.current.getInternalPlayer();
+                if (player && player.videoWidth && player.videoHeight) {
+                  setIsVertical(player.videoHeight > player.videoWidth);
+                }
+                setTimeout(() => {
+                  if (player && player.videoWidth && player.videoHeight) {
+                    setIsVertical(player.videoHeight > player.videoWidth);
+                  }
+                }, 500);
+              }
             }}
             onPause={onSeekEnd}
             onPlay={onSeekEnd}
@@ -194,7 +213,7 @@ const PreviewVideo: React.FC<Type> = ({
                   style: {
                     width: "100%",
                     height: "100%",
-                    objectFit: "cover",
+                    objectFit: "contain",
                   },
                 },
               },

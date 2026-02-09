@@ -33,8 +33,8 @@ const VideoItem: React.FC<Type> = ({
   const [loading, setLoading] = useState(true);
 
   return (
-    <li className="w-[32%] flex flex-col items-center gap-[17px] justify-between">
-      <div className="h-[316px] w-full rounded-[27px] overflow-hidden relative">
+    <li className="w-[32%] min-w-[280px] flex flex-col items-center gap-[17px] justify-between">
+      <div className="aspect-video w-full rounded-[27px] overflow-hidden relative bg-[#1a1a1a]">
         {src && (
           <>
             <Link
@@ -57,7 +57,7 @@ const VideoItem: React.FC<Type> = ({
                       style: {
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover",
+                        objectFit: "contain",
                       },
                     },
                   },

@@ -23,6 +23,7 @@ const Step3Cards = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [isVertical, setIsVertical] = useState(false);
 
   // New card form
   const [cardName, setCardName] = useState("");
@@ -178,8 +179,8 @@ const Step3Cards = () => {
 
       <div className="flex flex-wrap gap-[40px]">
         {/* Video Player */}
-        <div className="w-full max-w-[500px] mx-auto lg:mx-0">
-          <div className="aspect-video rounded-[15px] overflow-hidden bg-[#1E1E1E]">
+        <div className={`mx-auto lg:mx-0 ${isVertical ? "w-[280px]" : "w-full max-w-[500px]"}`}>
+          <div className={`rounded-[15px] overflow-hidden bg-[#1E1E1E] ${isVertical ? "aspect-[9/16]" : "aspect-video"}`}>
             <ReactPlayer
               ref={videoRef}
               url={videoLink}
@@ -190,6 +191,27 @@ const Step3Cards = () => {
               onProgress={onProgress}
               onPlay={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
+              onReady={() => {
+                if (videoRef.current) {
+                  const player = videoRef.current.getInternalPlayer();
+                  if (player && player.videoWidth && player.videoHeight) {
+                    setIsVertical(player.videoHeight > player.videoWidth);
+                  }
+                  setTimeout(() => {
+                    if (player && player.videoWidth && player.videoHeight) {
+                      setIsVertical(player.videoHeight > player.videoWidth);
+                    }
+                  }, 500);
+                }
+              }}
+              config={{
+                youtube: { playerVars: { rel: 0, modestbranding: 1 } },
+                file: {
+                  attributes: {
+                    style: { width: "100%", height: "100%", objectFit: "contain" },
+                  },
+                },
+              }}
             />
           </div>
           <p className="text-[#888] text-[14px] mt-2 text-center">

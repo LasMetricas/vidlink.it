@@ -34,7 +34,7 @@ const Index: React.FC<Type> = ({ videos }) => {
       dataLength={displayedVideos.length}
       hasMore={hasMore}
     >
-      <ul className="gap-x-[2%] gap-y-[150px] flex flex-wrap items-start px-[3.5%]">
+      <ul className="gap-x-[2%] gap-y-[50px] flex flex-wrap items-start px-[3.5%]">
         {displayedVideos?.map((item) => (
           <VideoItem
             videoId={item._id}
