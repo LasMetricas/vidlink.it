@@ -298,12 +298,15 @@ const Step4Preview = () => {
                   const isActive = activeCard?.start === card.start;
 
                   return (
-                    <div
+                    <a
                       key={card.no}
-                      className={`p-4 rounded-[10px] border transition-all ${
+                      href={card.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`block p-4 rounded-[10px] border transition-all cursor-pointer ${
                         isActive
                           ? "bg-blue/10 border-blue"
-                          : "bg-[#252525] border-[#333] hover:border-[#444]"
+                          : "bg-[#252525] border-[#333] hover:border-[#444] hover:bg-[#2a2a2a]"
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -322,7 +325,7 @@ const Step4Preview = () => {
                           </span>
                         )}
                       </div>
-                    </div>
+                    </a>
                   );
                 })}
               </div>
