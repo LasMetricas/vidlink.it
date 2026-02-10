@@ -327,20 +327,24 @@ const Step4Preview = () => {
         </div>
       </div>
 
-      {/* Publishing Progress */}
+      {/* Publishing Progress - Centered Modal Overlay */}
       {isPublishing && (
-        <div className="mt-6">
-          <div className="bg-[#1E1E1E] rounded-[15px] p-6">
-            <p className="text-center mb-4">
-              {uploadProgress < 100 ? "Uploading video..." : "Publishing..."}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#1E1E1E] rounded-[20px] p-10 max-w-[400px] w-[90%] text-center">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue/20 flex items-center justify-center">
+              <div className="w-10 h-10 border-4 border-blue border-t-transparent rounded-full animate-spin" />
+            </div>
+            <h3 className="text-[24px] font-bold mb-2">Be kind, we are uploading</h3>
+            <p className="text-[#888] text-[16px] mb-6">
+              {uploadProgress < 100 ? "Uploading your video..." : "Almost there, publishing..."}
             </p>
-            <div className="w-full h-2 bg-[#2a2a2a] rounded-full overflow-hidden">
+            <div className="w-full h-3 bg-[#2a2a2a] rounded-full overflow-hidden mb-3">
               <div
-                className="h-full bg-blue transition-all duration-300"
+                className="h-full bg-gradient-to-r from-blue to-purple-500 transition-all duration-300"
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
-            <p className="text-center text-[#888] text-[14px] mt-2">{uploadProgress}%</p>
+            <p className="text-[#888] text-[14px]">{uploadProgress}%</p>
           </div>
         </div>
       )}
