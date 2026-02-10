@@ -46,7 +46,9 @@ export default function HomeMobile() {
     const fetchVideos = async () => {
       const res = await getHomeVideos();
       if ("homeVideos" in res && res.homeVideos) {
-        setVideos(res.homeVideos as VideoData[]);
+        // Shuffle videos randomly
+        const shuffled = [...(res.homeVideos as VideoData[])].sort(() => Math.random() - 0.5);
+        setVideos(shuffled);
       }
       setLoading(false);
     };
@@ -153,26 +155,6 @@ function VideoCard({ video, isActive, isAuth }: VideoCardProps) {
   const [isMuted, setIsMuted] = useState(true);
   const [savedCards, setSavedCards] = useState<Set<string>>(new Set());
 
-  // Fetch cards when video becomes active
-  useEffect(() => {
-    if (isActive && !cardsFetched && video.card > 0) {
-      const fetchCards = async () => {
-        const res = await getVideo(video._id);
-        if ("videoInfo" in res && res.videoInfo?.cards) {
-          setCards(res.videoInfo.cards);
-          // Initialize saved cards from API
-          const saved = new Set<string>();
-          res.videoInfo.cards.forEach((card) => {
-            if (card.isSaved) saved.add(card._id);
-          });
-          setSavedCards(saved);
-        }
-        setCardsFetched(true);
-      };
-      fetchCards();
-    }
-  }, [isActive, cardsFetched, video._id, video.card]);
-
   // Update active card based on current time
   useEffect(() => {
     if (cards.length === 0) {
@@ -187,22 +169,41 @@ function VideoCard({ video, isActive, isAuth }: VideoCardProps) {
       .filter((card) => card.start <= effectiveTime)
       .sort((a, b) => b.start - a.start)[0];
 
-    // Check if this card should still be visible (within 5 seconds of its start time)
-    if (currentCard && effectiveTime - currentCard.start <= 5) {
+    // Card stays visible for 8 seconds after its start time
+    if (currentCard && effectiveTime - currentCard.start <= 8) {
       setActiveCard(currentCard);
     } else {
       setActiveCard(null);
     }
   }, [currentTime, cards]);
 
+  // Fetch cards immediately on mount if this is likely the first video
+  useEffect(() => {
+    if (!cardsFetched && video.card > 0) {
+      const fetchCards = async () => {
+        const res = await getVideo(video._id);
+        if ("videoInfo" in res && res.videoInfo?.cards) {
+          setCards(res.videoInfo.cards);
+          const saved = new Set<string>();
+          res.videoInfo.cards.forEach((card) => {
+            if (card.isSaved) saved.add(card._id);
+          });
+          setSavedCards(saved);
+        }
+        setCardsFetched(true);
+      };
+      fetchCards();
+    }
+  }, [video._id, video.card, cardsFetched]);
+
   const handleProgress = useCallback((state: { playedSeconds: number }) => {
     setCurrentTime(Math.floor(state.playedSeconds));
   }, []);
 
   return (
-    <div className="h-screen w-full snap-start relative flex items-center justify-center bg-black">
-      {/* Video Player - Always 9:16 full screen, plays inline */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="h-screen w-full snap-start relative bg-black overflow-hidden">
+      {/* Video Player - Always full screen, plays inline */}
+      <div className="absolute inset-0 pointer-events-none [&>div]:!w-full [&>div]:!h-full [&_video]:!object-cover [&_iframe]:!object-cover">
         <ReactPlayer
           ref={videoRef}
           url={video.videoLink}
@@ -214,6 +215,7 @@ function VideoCard({ video, isActive, isAuth }: VideoCardProps) {
           playsinline
           onProgress={handleProgress}
           progressInterval={500}
+          style={{ position: 'absolute', top: 0, left: 0 }}
           config={{
             youtube: {
               playerVars: {
@@ -233,12 +235,6 @@ function VideoCard({ video, isActive, isAuth }: VideoCardProps) {
                 muted: true,
                 disablePictureInPicture: true,
                 controlsList: "nodownload nofullscreen noremoteplayback",
-                style: {
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  pointerEvents: "none",
-                },
               },
             },
           }}
