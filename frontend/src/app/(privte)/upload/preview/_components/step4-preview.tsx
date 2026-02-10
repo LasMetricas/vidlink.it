@@ -80,9 +80,10 @@ const Step4Preview = () => {
       .filter((card) => card.start <= time)
       .sort((a, b) => b.start - a.start)[0];
 
-    if (currentCard && (!activeCard || activeCard.start !== currentCard.start)) {
+    // Card stays visible for 8 seconds after its start time
+    if (currentCard && time - currentCard.start <= 8) {
       setActiveCard(currentCard as CardType);
-    } else if (!currentCard) {
+    } else {
       setActiveCard(null);
     }
   };
@@ -298,21 +299,17 @@ const Step4Preview = () => {
                 return (
                   <div
                     key={index}
-                    className={`aspect-square rounded-[12px] p-3 flex flex-col justify-between transition-all ${cardColor} ${
+                    className={`aspect-square rounded-[12px] p-3 flex flex-col items-center justify-center transition-all ${cardColor} ${
                       isActive ? "ring-2 ring-white ring-offset-2 ring-offset-[#1E1E1E] scale-105" : ""
                     }`}
                   >
-                    <div className="flex justify-between items-start">
-                      <span className="w-7 h-7 rounded-full bg-black/30 flex items-center justify-center text-[12px] font-bold">
-                        {card.no}
-                      </span>
-                      <span className="text-[11px] bg-black/30 px-2 py-1 rounded-full">
-                        {formatTime(card.start)}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-[13px] font-semibold leading-tight line-clamp-2">{card.name}</p>
-                    </div>
+                    <span className="w-8 h-8 rounded-full bg-black/30 flex items-center justify-center text-[14px] font-bold mb-2">
+                      {card.no}
+                    </span>
+                    <p className="text-[16px] font-bold leading-tight text-center line-clamp-2 mb-1">{card.name}</p>
+                    <span className="text-[12px] bg-black/30 px-2 py-1 rounded-full">
+                      {formatTime(card.start)}
+                    </span>
                   </div>
                 );
               })}
