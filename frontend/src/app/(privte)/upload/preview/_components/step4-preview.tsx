@@ -293,9 +293,27 @@ const Step4Preview = () => {
                 <p className="text-[12px] mt-1">Cards appear at their timecode</p>
               </div>
             ) : (
-              <div className="space-y-2 max-h-[320px] overflow-y-auto">
-                {cardsToShow.filter(card => card.start <= currentTime).map((card) => {
+              <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
+                {cardsToShow.filter(card => card.start <= currentTime).map((card, index) => {
                   const isActive = activeCard?.start === card.start;
+                  const colors = [
+                    "from-purple-600 to-purple-800",
+                    "from-blue-600 to-blue-800",
+                    "from-emerald-600 to-emerald-800",
+                    "from-orange-600 to-orange-800",
+                    "from-pink-600 to-pink-800",
+                    "from-cyan-600 to-cyan-800",
+                  ];
+                  const colorClass = colors[index % colors.length];
+
+                  // Extract domain for favicon
+                  let favicon = "";
+                  try {
+                    const url = new URL(card.link);
+                    favicon = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
+                  } catch {
+                    favicon = "";
+                  }
 
                   return (
                     <a
@@ -303,27 +321,40 @@ const Step4Preview = () => {
                       href={card.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`block p-4 rounded-[10px] border transition-all cursor-pointer ${
-                        isActive
-                          ? "bg-blue/10 border-blue"
-                          : "bg-[#252525] border-[#333] hover:border-[#444] hover:bg-[#2a2a2a]"
+                      className={`block p-4 rounded-[14px] transition-all cursor-pointer bg-gradient-to-br ${colorClass} ${
+                        isActive ? "ring-2 ring-white ring-offset-2 ring-offset-[#1E1E1E] scale-[1.02]" : "hover:scale-[1.02]"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold ${
-                          isActive ? "bg-blue text-white" : "bg-[#333] text-[#888]"
-                        }`}>
+                      <div className="flex items-start justify-between mb-3">
+                        <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-[13px] font-bold">
                           {card.no}
                         </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-[14px] truncate">{card.name}</p>
-                          <p className="text-[12px] text-[#666]">{formatTime(card.start)}</p>
-                        </div>
                         {isActive && (
-                          <span className="text-[10px] bg-blue/20 text-blue px-2 py-1 rounded-full font-medium">
+                          <span className="text-[10px] bg-white/20 px-2 py-1 rounded-full font-semibold">
                             NOW
                           </span>
                         )}
+                      </div>
+
+                      <div className="flex items-center gap-2 mb-2">
+                        {favicon && (
+                          <img
+                            src={favicon}
+                            alt=""
+                            className="w-5 h-5 rounded"
+                            onError={(e) => { e.currentTarget.style.display = 'none' }}
+                          />
+                        )}
+                        <span className="text-[11px] text-white/60 truncate">
+                          {(() => { try { return new URL(card.link).hostname.replace('www.', ''); } catch { return ''; } })()}
+                        </span>
+                      </div>
+
+                      <p className="font-semibold text-[15px] leading-tight line-clamp-2 mb-2">{card.name}</p>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-white/50">{formatTime(card.start)}</span>
+                        <span className="text-[11px] text-white/70 font-medium">Visit →</span>
                       </div>
                     </a>
                   );
