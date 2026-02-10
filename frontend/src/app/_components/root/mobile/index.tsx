@@ -169,8 +169,8 @@ function VideoCard({ video, isActive, isAuth }: VideoCardProps) {
       .filter((card) => card.start <= effectiveTime)
       .sort((a, b) => b.start - a.start)[0];
 
-    // Card stays visible for 8 seconds after its start time
-    if (currentCard && effectiveTime - currentCard.start <= 8) {
+    // Card stays visible for 4 seconds after its start time
+    if (currentCard && effectiveTime - currentCard.start <= 4) {
       setActiveCard(currentCard);
     } else {
       setActiveCard(null);

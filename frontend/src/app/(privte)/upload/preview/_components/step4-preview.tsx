@@ -80,8 +80,8 @@ const Step4Preview = () => {
       .filter((card) => card.start <= time)
       .sort((a, b) => b.start - a.start)[0];
 
-    // Card stays visible for 8 seconds after its start time
-    if (currentCard && time - currentCard.start <= 8) {
+    // Card stays visible for 4 seconds after its start time
+    if (currentCard && time - currentCard.start <= 4) {
       setActiveCard(currentCard as CardType);
     } else {
       setActiveCard(null);
