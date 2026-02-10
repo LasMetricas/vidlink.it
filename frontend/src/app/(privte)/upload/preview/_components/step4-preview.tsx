@@ -278,42 +278,55 @@ const Step4Preview = () => {
             )}
           </div>
 
-          {/* Cards Summary */}
+          {/* Cards - Only visible after their timecode */}
           <div className="bg-[#1E1E1E] rounded-[15px] p-6">
-            <h3 className="font-semibold mb-4">Cards ({cardsToShow.length})</h3>
-            <div className="grid grid-cols-3 gap-3 max-h-[320px] overflow-y-auto">
-              {cardsToShow.map((card, index) => {
-                const colors = [
-                  "bg-gradient-to-br from-purple-500 to-purple-700",
-                  "bg-gradient-to-br from-blue-500 to-blue-700",
-                  "bg-gradient-to-br from-green-500 to-green-700",
-                  "bg-gradient-to-br from-orange-500 to-orange-700",
-                  "bg-gradient-to-br from-pink-500 to-pink-700",
-                  "bg-gradient-to-br from-teal-500 to-teal-700",
-                  "bg-gradient-to-br from-red-500 to-red-700",
-                  "bg-gradient-to-br from-indigo-500 to-indigo-700",
-                ];
-                const cardColor = colors[index % colors.length];
-                const isActive = activeCard?.start === card.start;
-
-                return (
-                  <div
-                    key={index}
-                    className={`aspect-square rounded-[12px] p-3 flex flex-col items-center justify-center transition-all ${cardColor} ${
-                      isActive ? "ring-2 ring-white ring-offset-2 ring-offset-[#1E1E1E] scale-105" : ""
-                    }`}
-                  >
-                    <span className="w-8 h-8 rounded-full bg-black/30 flex items-center justify-center text-[14px] font-bold mb-2">
-                      {card.no}
-                    </span>
-                    <p className="text-[16px] font-bold leading-tight text-center line-clamp-2 mb-1">{card.name}</p>
-                    <span className="text-[12px] bg-black/30 px-2 py-1 rounded-full">
-                      {formatTime(card.start)}
-                    </span>
-                  </div>
-                );
-              })}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-[15px]">Cards</h3>
+              <span className="text-[13px] text-[#666]">
+                {cardsToShow.filter(c => c.start <= currentTime).length} of {cardsToShow.length} revealed
+              </span>
             </div>
+
+            {cardsToShow.filter(c => c.start <= currentTime).length === 0 ? (
+              <div className="text-center py-8 text-[#555]">
+                <p className="text-[14px]">Play the video to reveal cards</p>
+                <p className="text-[12px] mt-1">Cards appear at their timecode</p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-[320px] overflow-y-auto">
+                {cardsToShow.filter(card => card.start <= currentTime).map((card) => {
+                  const isActive = activeCard?.start === card.start;
+
+                  return (
+                    <div
+                      key={card.no}
+                      className={`p-4 rounded-[10px] border transition-all ${
+                        isActive
+                          ? "bg-blue/10 border-blue"
+                          : "bg-[#252525] border-[#333] hover:border-[#444]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold ${
+                          isActive ? "bg-blue text-white" : "bg-[#333] text-[#888]"
+                        }`}>
+                          {card.no}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-[14px] truncate">{card.name}</p>
+                          <p className="text-[12px] text-[#666]">{formatTime(card.start)}</p>
+                        </div>
+                        {isActive && (
+                          <span className="text-[10px] bg-blue/20 text-blue px-2 py-1 rounded-full font-medium">
+                            NOW
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Auth Status */}
