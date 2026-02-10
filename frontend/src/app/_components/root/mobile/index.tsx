@@ -203,7 +203,7 @@ function VideoCard({ video, isActive, isAuth }: VideoCardProps) {
   return (
     <div className="h-screen w-full snap-start relative bg-black overflow-hidden">
       {/* Video Player - Always full screen, plays inline */}
-      <div className="absolute inset-0 pointer-events-none [&>div]:!w-full [&>div]:!h-full [&_video]:!object-cover [&_iframe]:!object-cover">
+      <div className="absolute inset-0 pointer-events-none [&>div]:!absolute [&>div]:!inset-0 [&>div>div]:!w-full [&>div>div]:!h-full [&_video]:!object-cover [&_video]:!w-full [&_video]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150">
         <ReactPlayer
           ref={videoRef}
           url={video.videoLink}
