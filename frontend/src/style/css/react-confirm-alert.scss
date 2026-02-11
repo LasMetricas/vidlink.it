@@ -1,10 +1,94 @@
+// Custom styling for react-confirm-alert to match app theme
+
+.react-confirm-alert-overlay {
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(8px);
+  z-index: 9999 !important;
+}
+
+.react-confirm-alert {
+  z-index: 10000 !important;
+}
+
 .react-confirm-alert-body {
-  font-family: Arial, Helvetica, sans-serif;
-  width: 350px;
-  padding: 30px;
-  text-align: left;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13);
-  color: #666;
+  font-family: inherit !important;
+  width: 420px !important;
+  max-width: 90vw !important;
+  padding: 40px 32px !important;
+  text-align: center !important;
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6) !important;
+  color: #fff !important;
+
+  h1 {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    margin-bottom: 16px !important;
+    color: #fff !important;
+    letter-spacing: 0.3px;
+  }
+
+  // Message text
+  > div:not(.react-confirm-alert-button-group) {
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+    color: #a0a0a0 !important;
+    margin-bottom: 8px !important;
+  }
+}
+
+.react-confirm-alert-button-group {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  margin-top: 28px !important;
+
+  button {
+    padding: 14px 36px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+
+    &:first-child {
+      background: #3b82f6 !important;
+      color: #fff !important;
+
+      &:hover {
+        background: #2563eb !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+      }
+    }
+
+    &:last-child:not(:first-child) {
+      background: #2a2a2a !important;
+      color: #fff !important;
+      border: 1px solid #444 !important;
+
+      &:hover {
+        background: #333 !important;
+        transform: translateY(-2px) !important;
+      }
+    }
+  }
+}
+
+// Single button dialogs (like success/error alerts)
+.react-confirm-alert-button-group button:only-child {
+  background: #3b82f6 !important;
+  color: #fff !important;
+  min-width: 120px !important;
+
+  &:hover {
+    background: #2563eb !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+  }
 }

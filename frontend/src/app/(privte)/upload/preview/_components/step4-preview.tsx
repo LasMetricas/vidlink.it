@@ -5,11 +5,13 @@ import dynamic from "next/dynamic";
 import type ReactPlayerClass from "react-player";
 import { useAtom } from "jotai";
 import Footer from "@/app/_components/layout/desktop/footer";
-import { getUploadData, clearUploadData } from "@/utils/uploadStorage";
+import { getUploadData, clearUploadData, setUploadData } from "@/utils/uploadStorage";
 import { cardAtom, CardType } from "@/store";
 import { errorModal, successModal } from "@/utils/confirm";
 import useVerifyAuth from "@/hooks/useVerifyAuth";
 import useVideo from "@/hooks/useVideo";
+import Cookies from "js-cookie";
+import { logError } from "@/utils/errorHandler";
 
 const ReactPlayer = dynamic(() => import("react-player/lazy"), {
   ssr: false,
@@ -55,9 +57,10 @@ const Step4Preview = () => {
           setDescription(data.description || "");
           setIsLoaded(true);
         })
-        .catch(() => {
+        .catch((err) => {
           // Blob URL is invalid (page was refreshed), redirect to step 1
-          errorModal("Your video session expired. Please re-upload your video.");
+          logError("session_expired", err, { reason: "blob_url_invalid" });
+          errorModal("Your video session expired. Don't worry - just re-upload your video to continue.");
           router.push("/upload");
         });
     } else {
@@ -92,13 +95,6 @@ const Step4Preview = () => {
     // Check if user is authenticated
     if (authLoading) return;
 
-    if (!isAuth) {
-      // Store current URL to return after login
-      sessionStorage.setItem("vidlink_return_url", "/upload/preview");
-      router.push("/login");
-      return;
-    }
-
     setIsPublishing(true);
 
     try {
@@ -117,11 +113,23 @@ const Step4Preview = () => {
         const uploadRes = await storeVideoFile(formData);
         if ("videoLink" in uploadRes && uploadRes.videoLink) {
           finalVideoLink = uploadRes.videoLink;
+          // Update storage with S3 URL so it persists through OAuth redirect
+          setUploadData({ videoLink: finalVideoLink });
+          setVideoLink(finalVideoLink);
         } else {
-          errorModal(uploadRes.message || "Failed to upload video");
+          const msg = logError("upload_video", uploadRes, { videoLink });
+          errorModal(uploadRes.message || msg);
           setIsPublishing(false);
           return;
         }
+      }
+
+      // Now check authentication - video is already uploaded to S3 at this point
+      if (!isAuth) {
+        setIsPublishing(false);
+        // Pass return URL directly in query string - most reliable
+        router.push("/login?returnTo=/upload/preview");
+        return;
       }
 
       // Prepare cards data
@@ -142,15 +150,16 @@ const Step4Preview = () => {
       const res = await publish(formData, "new", "");
 
       if ("videoId" in res && res.videoId) {
-        successModal("Video published successfully!");
+        successModal("Your video is live! Redirecting...");
         clearUploadData();
         router.push(`/video/${res.videoId}`);
       } else {
-        errorModal(res.message || "Failed to publish video");
+        const msg = logError("publish_video", res, { title, cardsCount: cardsData.length });
+        errorModal(res.message || msg);
       }
     } catch (error) {
-      console.error("Publish error:", error);
-      errorModal("An error occurred while publishing");
+      const msg = logError("publish_video", error, { title });
+      errorModal(msg);
     } finally {
       setIsPublishing(false);
     }
@@ -293,26 +302,29 @@ const Step4Preview = () => {
                 <p className="text-[12px] mt-1">Cards appear at their timecode</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
+              <div className="flex flex-wrap gap-6 max-h-[450px] overflow-y-auto p-2">
                 {cardsToShow.filter(card => card.start <= currentTime).map((card, index) => {
                   const isActive = activeCard?.start === card.start;
                   const colors = [
-                    "from-purple-600 to-purple-800",
-                    "from-blue-600 to-blue-800",
-                    "from-emerald-600 to-emerald-800",
-                    "from-orange-600 to-orange-800",
-                    "from-pink-600 to-pink-800",
-                    "from-cyan-600 to-cyan-800",
+                    "from-purple-500 to-purple-700",
+                    "from-blue-500 to-blue-700",
+                    "from-emerald-500 to-emerald-700",
+                    "from-orange-500 to-orange-700",
+                    "from-pink-500 to-pink-700",
+                    "from-cyan-500 to-cyan-700",
                   ];
                   const colorClass = colors[index % colors.length];
 
                   // Extract domain for favicon
                   let favicon = "";
+                  let domain = "";
                   try {
                     const url = new URL(card.link);
                     favicon = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
+                    domain = url.hostname.replace('www.', '');
                   } catch {
                     favicon = "";
+                    domain = "";
                   }
 
                   return (
@@ -321,40 +333,52 @@ const Step4Preview = () => {
                       href={card.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`block p-4 rounded-[14px] transition-all cursor-pointer bg-gradient-to-br ${colorClass} ${
-                        isActive ? "ring-2 ring-white ring-offset-2 ring-offset-[#1E1E1E] scale-[1.02]" : "hover:scale-[1.02]"
+                      className={`relative block w-[140px] h-[140px] rounded-[16px] p-4 transition-all cursor-pointer bg-gradient-to-br ${colorClass} border-2 border-white/40 shadow-lg ${
+                        isActive ? "border-white scale-105" : "hover:scale-105 hover:border-white/70 hover:shadow-xl"
                       }`}
                     >
-                      <div className="flex items-start justify-between mb-3">
-                        <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-[13px] font-bold">
-                          {card.no}
-                        </span>
-                        {isActive && (
-                          <span className="text-[10px] bg-white/20 px-2 py-1 rounded-full font-semibold">
-                            NOW
-                          </span>
-                        )}
-                      </div>
+                      {/* Card Number Badge */}
+                      <span className="absolute top-3 left-3 w-7 h-7 rounded-full bg-white/25 flex items-center justify-center text-[12px] font-bold">
+                        {card.no}
+                      </span>
 
-                      <div className="flex items-center gap-2 mb-2">
-                        {favicon && (
-                          <img
-                            src={favicon}
-                            alt=""
-                            className="w-5 h-5 rounded"
-                            onError={(e) => { e.currentTarget.style.display = 'none' }}
-                          />
-                        )}
-                        <span className="text-[11px] text-white/60 truncate">
-                          {(() => { try { return new URL(card.link).hostname.replace('www.', ''); } catch { return ''; } })()}
+                      {/* NOW Badge */}
+                      {isActive && (
+                        <span className="absolute top-3 right-3 text-[9px] bg-white text-black px-2 py-0.5 rounded-full font-bold">
+                          NOW
+                        </span>
+                      )}
+
+                      {/* Timecode - Center */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-[18px] font-bold text-white/90 bg-black/30 px-2 py-1 rounded-lg">
+                          {formatTime(card.start)}
                         </span>
                       </div>
 
-                      <p className="font-semibold text-[15px] leading-tight line-clamp-2 mb-2">{card.name}</p>
+                      {/* Card Content - Bottom aligned */}
+                      <div className="absolute bottom-3 left-3 right-3">
+                        {/* Favicon + Domain */}
+                        <div className="flex items-center gap-1.5 mb-1">
+                          {favicon ? (
+                            <img
+                              src={favicon}
+                              alt=""
+                              className="w-4 h-4 rounded"
+                              onError={(e) => { e.currentTarget.style.display = 'none' }}
+                            />
+                          ) : (
+                            <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                          )}
+                          {domain && (
+                            <span className="text-[10px] text-white/70 truncate">{domain}</span>
+                          )}
+                        </div>
 
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-white/50">{formatTime(card.start)}</span>
-                        <span className="text-[11px] text-white/70 font-medium">Visit →</span>
+                        {/* Card Name */}
+                        <p className="font-semibold text-[13px] leading-tight line-clamp-2">{card.name}</p>
                       </div>
                     </a>
                   );

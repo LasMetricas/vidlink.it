@@ -55,11 +55,17 @@ const Step1Upload = () => {
     }
 
     if (videoSrc && uploadedFile) {
-      // File upload - store blob URL and file info
+      // File upload - clear old data and start fresh
+      clearUploadData();
       setUploadData({
         videoLink: videoSrc,
         duration: fileDuration,
         step: 2,
+        // Reset other fields to ensure clean state
+        title: "",
+        description: "",
+        info: "",
+        cards: [],
       });
       // Store file reference in sessionStorage for this session
       sessionStorage.setItem("vidlink_upload_file", "true");
@@ -76,11 +82,28 @@ const Step1Upload = () => {
       if (!isValidLink || !linkDuration || linkDuration <= 0) {
         return errorModal("Invalid video link.");
       }
-      setUploadData({
-        videoLink: url,
-        duration: linkDuration,
-        step: 2,
-      });
+      // Check if this is a different video URL than before
+      const existingData = getUploadData();
+      if (existingData.videoLink !== url) {
+        // New video - clear old data and start fresh
+        clearUploadData();
+        setUploadData({
+          videoLink: url,
+          duration: linkDuration,
+          step: 2,
+          title: "",
+          description: "",
+          info: "",
+          cards: [],
+        });
+      } else {
+        // Same video - keep existing data
+        setUploadData({
+          videoLink: url,
+          duration: linkDuration,
+          step: 2,
+        });
+      }
       router.push("/upload/info");
     } else {
       return errorModal("Please enter a video link or upload a file.");
