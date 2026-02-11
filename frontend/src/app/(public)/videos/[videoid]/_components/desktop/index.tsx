@@ -132,9 +132,9 @@ const VideoDesktop: React.FC<Type> = ({
               list of cards
             </h2>
           </div>
-          <div className="flex items-start justify-between gap-[70px] h-[673px] w-full">
-            {/* <div className="h-full flex flex-col justify-between"> */}
-            <div className="h-full flex flex-col justify-between flex-grow ">
+          <div className="flex items-start justify-between gap-[40px] w-full">
+            {/* Video and Settings */}
+            <div className="flex flex-col flex-grow max-w-[800px]">
               <PreviewVideo
                 setCurrentTime={setCurrentTime}
                 cards={videoInfo.cards}
@@ -143,6 +143,7 @@ const VideoDesktop: React.FC<Type> = ({
                 signal={signal}
                 videoId={videoId || ""}
               />
+              <div className="mt-4">
               <SettingBar
                 handleLike={handleLike}
                 setFollowStatus={setFollowStatus}
@@ -154,9 +155,10 @@ const VideoDesktop: React.FC<Type> = ({
                 followStatus={followStatus}
                 videoId={videoId}
               />
+              </div>
             </div>
-            {/* <div className="h-[94%] overflow-y-auto overflow-x-hidden"> */}
-            <ul className="grid grid-cols-2 gap-x-[9px] gap-y-[10px] w-full max-w-[380px] h-[94%] content-start overflow-y-auto overflow-x-hidden">
+            {/* Cards Section */}
+            <ul className="grid grid-cols-2 gap-4 w-full max-w-[400px] max-h-[700px] content-start overflow-y-auto overflow-x-hidden p-2">
               {nextCard.start !== -1 && nextCard.no !== -1 ? (
                 <Suspense fallback={<Loading />}>
                   <CardNext handleNext={handleNext} start={nextCard.start} />

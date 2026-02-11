@@ -18,7 +18,7 @@ const VideoSchema = new Schema<IVideo>(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, required: true },
     title: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String, default: "" },
     info: { type: String, required: true },
     duration: { type: Number, required: true },
     videoLink: { type: String, required: true },

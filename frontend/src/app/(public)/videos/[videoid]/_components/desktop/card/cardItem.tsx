@@ -9,7 +9,6 @@ interface Type {
   setSignal(value: boolean): void;
   name: string;
   start: number;
-  // icon: string;
   no: number;
   index: number;
   isSaved: boolean;
@@ -19,12 +18,12 @@ interface Type {
   cardId: string;
   isAuth: boolean;
 }
+
 const CardItem: React.FC<Type> = ({
   setIsSelected,
   setSignal,
   name,
   start,
-  // icon,
   no,
   isSaved,
   link,
@@ -32,86 +31,152 @@ const CardItem: React.FC<Type> = ({
   currentCard,
   cardId,
   isAuth,
+  index,
 }) => {
   const { saveCard, increaseClicks, loading } = useVideo();
   const [saved, setSaved] = useState<boolean>(isSaved);
 
-  // const IconComponent = LucideIcons[
-  //   icon as keyof typeof LucideIcons
-  // ] as React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  const colors = [
+    "from-purple-500 to-purple-700",
+    "from-blue-500 to-blue-700",
+    "from-emerald-500 to-emerald-700",
+    "from-orange-500 to-orange-700",
+    "from-pink-500 to-pink-700",
+    "from-cyan-500 to-cyan-700",
+  ];
+  const colorClass = colors[(no - 1) % colors.length];
+
+  // Extract domain for favicon
+  let favicon = "";
+  let domain = "";
+  try {
+    const url = new URL(link);
+    favicon = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
+    domain = url.hostname.replace("www.", "");
+  } catch {
+    favicon = "";
+    domain = "";
+  }
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins < 10 ? `0${mins}` : mins}:${secs < 10 ? `0${secs}` : secs}`;
+  };
 
   const handlePreview = () => {
-    setIsSelected(no-1);
+    setIsSelected(no - 1);
     setSignal(!signal);
   };
 
-  //save card
   const handleSavingCard = async () => {
     if (!isAuth) {
-      errorModal("You must log in before the saving card.");
+      errorModal("You must log in before saving a card.");
       return;
+    }
+    if (loading) return;
+    const res = await saveCard(cardId);
+    if (res.status === 200 && "saved" in res) {
+      setSaved(res.saved);
     } else {
-      if (loading) return;
-      const res = await saveCard(cardId);
-      if (res.status === 200 && "saved" in res) {
-        setSaved(res.saved);
-      } else {
-        errorModal(res.message || "Something went wrong");
-      }
+      errorModal(res.message || "Something went wrong");
     }
   };
-  // visite the Link
+
   const handleVisit = () => {
     window.open(link, "_blank", "noopener,noreferrer");
     increaseClicks(cardId);
   };
+
+  const isActive = currentCard + 1 === no;
+
   return (
-    <>
-      <li
-        className={`text-black text-[20px] font-semibold w-[174px] h-[148px] flex flex-col justify-between z-30 relative`}
+    <li className="relative">
+      <div
+        onClick={handlePreview}
+        className={`relative w-[174px] h-[174px] rounded-[16px] p-4 transition-all cursor-pointer bg-gradient-to-br ${colorClass} border-2 shadow-lg ${
+          isActive
+            ? "border-white scale-105"
+            : "border-white/40 hover:scale-105 hover:border-white/70 hover:shadow-xl"
+        }`}
       >
-        <button
-          onClick={handlePreview}
-          className={`${
-            currentCard + 1 === no ? "hidden" : "block"
-          } absolute top-0 left-0 w-full h-full opacity-[40%] bg-gray-900 rounded-[6px]`}
-        ></button>
-        <div className="bg-white rounded-[6px] h-[104px] p-[6px] overflow-hidden">
-          <div className="flex justify-between w-full items-center">
-            <span className="">{no < 10 ? `0${no}` : no}</span>{" "}
-            <i className="font-normal">
-              ({Math.floor(start / 60)}:
-              {start % 60 < 10 ? `0${start % 60}` : start % 60})
-            </i>
-          </div>
-          <div
-            className={`flex items-center h-[38.4px] w-full justify-center text-center mt-[19px]`}
-          >
-            <h1 className={``}>{name.toUpperCase()}</h1>
-            {/* <IconComponent className="size-[18.29px]" /> */}
-          </div>
+        {/* Dimmed overlay when not active */}
+        {!isActive && (
+          <div className="absolute inset-0 bg-black/40 rounded-[14px]" />
+        )}
+
+        {/* Card Number Badge */}
+        <span className="absolute top-3 left-3 w-7 h-7 rounded-full bg-white/25 flex items-center justify-center text-[12px] font-bold z-10">
+          {no}
+        </span>
+
+        {/* NOW Badge */}
+        {isActive && (
+          <span className="absolute top-3 right-3 text-[9px] bg-white text-black px-2 py-0.5 rounded-full font-bold z-10">
+            NOW
+          </span>
+        )}
+
+        {/* Timecode - Center */}
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <span className="text-[18px] font-bold text-white/90 bg-black/30 px-2 py-1 rounded-lg">
+            {formatTime(start)}
+          </span>
         </div>
-        <div className="flex h-[40px] gap-1 justify-between">
-          <div
-            className={`bg-white h-full rounded-[6px] w-[50%] flex justify-center items-center`}
-          >
-            <button onClick={handleSavingCard} className="size-[25px]">
-              <LucideIcons.Bookmark
-                className={`${
-                  saved ? "fill-blue text-blue" : "text-gray-700"
-                } w-[25px]`}
+
+        {/* Card Content - Bottom aligned */}
+        <div className="absolute bottom-3 left-3 right-3 z-10">
+          {/* Favicon + Domain */}
+          <div className="flex items-center gap-1.5 mb-1">
+            {favicon ? (
+              <img
+                src={favicon}
+                alt=""
+                className="w-4 h-4 rounded"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
               />
-            </button>
+            ) : (
+              <LucideIcons.Link className="w-4 h-4 text-white/60" />
+            )}
+            {domain && (
+              <span className="text-[10px] text-white/70 truncate">
+                {domain}
+              </span>
+            )}
           </div>
-          <button
-            onClick={handleVisit}
-            className={`bg-blue h-full rounded-[6px] w-[50%] flex justify-center items-center`}
-          >
-            <LucideIcons.Link className="size-[25px] text-foreground" />
-          </button>
+
+          {/* Card Name */}
+          <p className="font-semibold text-[13px] leading-tight line-clamp-2 text-white">
+            {name}
+          </p>
         </div>
-      </li>
-    </>
+      </div>
+
+      {/* Action buttons below card */}
+      <div className="flex gap-2 mt-2 w-[174px]">
+        <button
+          onClick={handleSavingCard}
+          className={`flex-1 h-[36px] rounded-[8px] flex items-center justify-center transition-colors ${
+            saved
+              ? "bg-blue text-white"
+              : "bg-white/10 hover:bg-white/20 text-white"
+          }`}
+        >
+          <LucideIcons.Bookmark
+            className={`w-5 h-5 ${saved ? "fill-white" : ""}`}
+          />
+        </button>
+        <button
+          onClick={handleVisit}
+          className="flex-1 h-[36px] rounded-[8px] bg-blue hover:bg-blue/80 flex items-center justify-center transition-colors"
+        >
+          <LucideIcons.ExternalLink className="w-5 h-5 text-white" />
+        </button>
+      </div>
+    </li>
   );
 };
+
 export default CardItem;

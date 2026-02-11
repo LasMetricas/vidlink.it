@@ -150,9 +150,9 @@ const Step4Preview = () => {
       const res = await publish(formData, "new", "");
 
       if ("videoId" in res && res.videoId) {
-        successModal("Your video is live! Redirecting...");
+        successModal("Your video is live!");
         clearUploadData();
-        router.push(`/video/${res.videoId}`);
+        router.push(`/videos`);
       } else {
         const msg = logError("publish_video", res, { title, cardsCount: cardsData.length });
         errorModal(res.message || msg);
