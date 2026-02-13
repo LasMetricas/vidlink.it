@@ -7,7 +7,6 @@ import { useAtom } from "jotai";
 import dynamic from "next/dynamic";
 import { redirect, useParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { isMobile } from "react-device-detect";
 const VideoDesktop = dynamic(() => import("./_components/desktop"));
 const VideoMobile = dynamic(() => import("./_components/mobile"));
 
@@ -53,6 +52,16 @@ const Page = () => {
     ? params.videoid[0]
     : params.videoid;
   const { getVideo, loading } = useVideo();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile based on screen width (works with DevTools)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const [userInfo, setUserInfo] = useState<UserInfo>({
     userName: "",
     picture: "",
