@@ -14,6 +14,7 @@ import {
   getHomeVideos,
   getMyVideo,
   getMyVideos,
+  getRandomVideo,
   getUserInfo,
   getUserName,
   getUserVideos,
@@ -37,6 +38,7 @@ videoRoutes.route("/publish").post(authMiddleware, publishVideo);
 videoRoutes.route("/delete").delete(authMiddleware, deleteVideo);
 videoRoutes.route("/getvideos").get(optionalAuthMiddleware, getVideos);
 videoRoutes.route("/gethomevideos").get(optionalAuthMiddleware, getHomeVideos);
+videoRoutes.route("/getrandomvideo").get(getRandomVideo);
 videoRoutes.route("/getvideo").get(optionalAuthMiddleware, getVideo);
 videoRoutes.route("/geteditvideo").get(authMiddleware, getEditVideo);
 videoRoutes.route("/getmyvideo").get(authMiddleware, getMyVideo);

@@ -55,6 +55,7 @@ const Step4Preview = () => {
           setTitle(data.title);
           setDetails(data.info || "");
           setDescription(data.description || "");
+          setIsVertical(data.isVertical || false);
           setIsLoaded(true);
         })
         .catch((err) => {
@@ -69,6 +70,7 @@ const Step4Preview = () => {
       setTitle(data.title);
       setDetails(data.info || "");
       setDescription(data.description || "");
+      setIsVertical(data.isVertical || false);
       setIsLoaded(true);
     }
   }, [router]);
@@ -146,6 +148,7 @@ const Step4Preview = () => {
       formData.append("description", description);
       formData.append("info", details);
       formData.append("cards", JSON.stringify(cardsData));
+      formData.append("isVertical", String(isVertical));
 
       const res = await publish(formData, "new", "");
 
@@ -231,11 +234,15 @@ const Step4Preview = () => {
                 if (videoRef.current) {
                   const player = videoRef.current.getInternalPlayer();
                   if (player && player.videoWidth && player.videoHeight) {
-                    setIsVertical(player.videoHeight > player.videoWidth);
+                    const vertical = player.videoHeight > player.videoWidth;
+                    setIsVertical(vertical);
+                    setUploadData({ isVertical: vertical });
                   }
                   setTimeout(() => {
                     if (player && player.videoWidth && player.videoHeight) {
-                      setIsVertical(player.videoHeight > player.videoWidth);
+                      const vertical = player.videoHeight > player.videoWidth;
+                      setIsVertical(vertical);
+                      setUploadData({ isVertical: vertical });
                     }
                   }, 500);
                 }

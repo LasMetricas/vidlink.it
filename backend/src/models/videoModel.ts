@@ -12,6 +12,7 @@ interface IVideo extends Document {
   card: number;
   watchTime: number;
   draft: boolean;
+  isVertical: boolean;
 }
 
 const VideoSchema = new Schema<IVideo>(
@@ -27,6 +28,7 @@ const VideoSchema = new Schema<IVideo>(
     card: { type: Number, default: 0 },
     watchTime: { type: Number, default: 0 },
     draft: { type: Boolean, default: false },
+    isVertical: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

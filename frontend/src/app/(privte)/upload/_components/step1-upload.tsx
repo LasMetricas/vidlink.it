@@ -23,18 +23,22 @@ const unsupportedPlatforms = [
 const Step1Upload = () => {
   const router = useRouter();
   const videoRef = useRef<ReactPlayer>(null);
-  const { validateVideo, cancelVideo, error, videoSrc, uploadedFile, fileDuration } = useVideoValidate();
+  const { validateVideo, cancelVideo, error, videoSrc, uploadedFile, fileDuration, isVertical: fileIsVertical } = useVideoValidate();
 
   const [url, setUrl] = useState("");
   const [linkDuration, setLinkDuration] = useState<number | null>(null);
   const [isValidLink, setIsValidLink] = useState<boolean | null>(null);
   const [ytErr, setYtError] = useState<string>("");
+  const [isVertical, setIsVertical] = useState<boolean>(false);
 
   // Load existing data on mount
   useEffect(() => {
     const data = getUploadData();
     if (data.videoLink && !data.videoLink.startsWith("blob:")) {
       setUrl(data.videoLink);
+    }
+    if (data.isVertical !== undefined) {
+      setIsVertical(data.isVertical);
     }
   }, []);
 
@@ -61,6 +65,7 @@ const Step1Upload = () => {
         videoLink: videoSrc,
         duration: fileDuration,
         step: 2,
+        isVertical: fileIsVertical,
         // Reset other fields to ensure clean state
         title: "",
         description: "",
@@ -91,6 +96,7 @@ const Step1Upload = () => {
           videoLink: url,
           duration: linkDuration,
           step: 2,
+          isVertical: isVertical,
           title: "",
           description: "",
           info: "",
@@ -102,6 +108,7 @@ const Step1Upload = () => {
           videoLink: url,
           duration: linkDuration,
           step: 2,
+          isVertical: isVertical,
         });
       }
       router.push("/upload/info");
@@ -132,6 +139,21 @@ const Step1Upload = () => {
         onDuration={(duration) => {
           setLinkDuration(duration);
           setIsValidLink(duration > 0);
+        }}
+        onReady={() => {
+          // Try to detect vertical video from ReactPlayer internal player
+          const player = videoRef.current?.getInternalPlayer();
+          if (player) {
+            // For HTML5 video element
+            if (player.videoWidth && player.videoHeight) {
+              setIsVertical(player.videoHeight > player.videoWidth);
+            }
+            // For YouTube iframe - check aspect ratio from iframe dimensions
+            else if (player.getVideoData) {
+              // YouTube API - we can't directly get dimensions, assume horizontal by default
+              setIsVertical(false);
+            }
+          }
         }}
         onError={(e) => {
           setYtError(e);

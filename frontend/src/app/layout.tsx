@@ -67,20 +67,25 @@ export default function RootLayout({
         </ErrorBoundary>
         <ToastContainer
           theme="dark"
-          position="top-center"
-          autoClose={3000}
-          hideProgressBar={false}
+          position="bottom-center"
+          autoClose={2000}
+          hideProgressBar
           newestOnTop
           closeOnClick
-          pauseOnHover
+          pauseOnHover={false}
           toastStyle={{
-            background: '#1a1a1a',
-            border: '1px solid #333',
-            borderRadius: '12px',
+            background: 'rgba(0, 0, 0, 0.9)',
+            backdropFilter: 'blur(10px)',
+            border: 'none',
+            borderRadius: '30px',
             color: '#fff',
             fontSize: '14px',
             fontWeight: 500,
+            padding: '12px 24px',
+            minHeight: 'auto',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
           }}
+          icon={false}
         />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>

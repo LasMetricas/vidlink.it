@@ -15,6 +15,7 @@ export interface UploadData {
     isSaved?: boolean;
   }>;
   step: number;
+  isVertical: boolean;
 }
 
 const STORAGE_KEY = "vidlink_upload_data";
@@ -27,6 +28,7 @@ const defaultData: UploadData = {
   info: "",
   cards: [],
   step: 1,
+  isVertical: false,
 };
 
 export const getUploadData = (): UploadData => {

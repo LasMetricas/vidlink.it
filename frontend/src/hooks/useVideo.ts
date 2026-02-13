@@ -14,6 +14,7 @@ import {
   GETHOMEVIDEOS,
   GETMYVIDEO,
   GETMYVIDEOS,
+  GETRANDOMVIDEO,
   GETUSERINFO,
   GETUSERNAME,
   GETUSERVIDEOS,
@@ -875,11 +876,29 @@ const useVideo = () => {
       setLoading(false);
     }
   };
+
+  // Get random video for /watch landing
+  const getRandomVideo = async (): Promise<any> => {
+    setLoading(true);
+    try {
+      const res = await axios.get(GETRANDOMVIDEO);
+      return { ...res.data, status: res.status };
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return { message: error?.response?.data?.message || "No videos available" };
+      }
+      return { message: "An unknown error occurred" };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     publish,
     deleteVideo,
     getVideos,
     getHomeVideos,
+    getRandomVideo,
     addLike,
     getMyVideos,
     getUserVideos,

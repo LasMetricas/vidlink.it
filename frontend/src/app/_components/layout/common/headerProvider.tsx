@@ -15,9 +15,10 @@ const HeaderProvider = ({ children }: { children: React.ReactNode }) => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Mobile home page has its own header
+  // Hide header on watch page (has its own nav) and mobile home
+  const isWatchPage = pathname === "/watch";
   const isHomePage = pathname === "/";
-  const showHeader = !(isMobile && isHomePage);
+  const showHeader = !isWatchPage && !(isMobile && isHomePage);
 
   return (
     <>

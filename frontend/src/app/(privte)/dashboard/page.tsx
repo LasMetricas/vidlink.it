@@ -19,6 +19,7 @@ export interface UserInfoType {
   isAdmin: boolean;
 }
 export interface VideoType {
+  _id: string;
   title: string;
   videoLink: string;
   info: string;
