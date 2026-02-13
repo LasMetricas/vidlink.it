@@ -156,7 +156,9 @@ const WatchPage = () => {
   if (!videoInfo) return <Loading />;
 
   const isVertical = videoInfo.isVertical;
-  const displayCards = videoInfo.cards?.slice(0, 4) || [];
+  // Only show cards that have been reached by current time
+  const reachedCards = videoInfo.cards?.filter(card => card.start <= currentTime) || [];
+  const displayCards = showCards ? reachedCards : reachedCards.slice(0, 4);
 
   // Card component for reuse
   const CardItem = ({ card, index, isActive = false, size = "normal" }: { card: CardT; index: number; isActive?: boolean; size?: "normal" | "small" }) => {
@@ -315,27 +317,31 @@ const WatchPage = () => {
           {/* Cards Sidebar - Desktop */}
           <div className="w-[320px] h-full flex flex-col pt-16 pb-8 overflow-hidden">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-lg">Cards</h3>
-              {videoInfo.cards && videoInfo.cards.length > 4 && (
+              <h3 className="font-bold text-lg">Cards ({reachedCards.length}/{videoInfo.cards?.length || 0})</h3>
+              {reachedCards.length > 4 && (
                 <button
                   onClick={() => setShowCards(!showCards)}
                   className="text-xs text-blue hover:underline"
                 >
-                  {showCards ? "Show less" : `View all ${videoInfo.cards.length}`}
+                  {showCards ? "Show less" : "View all"}
                 </button>
               )}
             </div>
             <div className="flex-1 overflow-y-auto pr-2">
-              <div className="grid grid-cols-2 gap-3">
-                {(showCards ? videoInfo.cards : displayCards)?.map((card, index) => (
-                  <CardItem
-                    key={card._id}
-                    card={card}
-                    index={index}
-                    isActive={activeCard?._id === card._id}
-                  />
-                ))}
-              </div>
+              {reachedCards.length === 0 ? (
+                <p className="text-[#666] text-sm">Cards will appear as you watch...</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {displayCards.map((card, index) => (
+                    <CardItem
+                      key={card._id}
+                      card={card}
+                      index={index}
+                      isActive={activeCard?._id === card._id}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
