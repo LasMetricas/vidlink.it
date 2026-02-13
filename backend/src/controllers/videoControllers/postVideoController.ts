@@ -30,7 +30,7 @@ export const publishVideo = expressAsyncHandler(
       return;
     }
 
-    const { videoLink, duration, title, description, info, cards } = req.body;
+    const { videoLink, duration, title, description, info, cards, isVertical } = req.body;
 
     const status = req.query.status as string;
     const videoId = req.query.videoId as string | undefined;
@@ -59,6 +59,7 @@ export const publishVideo = expressAsyncHandler(
             description,
             info,
             card: parsedCards.length,
+            isVertical: isVertical === "true" || isVertical === true,
           },
           { new: true } // Return updated document
         ).lean();
@@ -112,6 +113,7 @@ export const publishVideo = expressAsyncHandler(
           description,
           info,
           card: parsedCards.length,
+          isVertical: isVertical === "true" || isVertical === true,
         });
 
         await video.save();

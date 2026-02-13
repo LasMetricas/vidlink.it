@@ -14,6 +14,7 @@ import {
   GETHOMEVIDEOS,
   GETMYVIDEO,
   GETMYVIDEOS,
+  GETRANDOMVIDEO,
   GETUSERINFO,
   GETUSERNAME,
   GETUSERVIDEOS,
@@ -141,17 +142,24 @@ const useVideo = () => {
       return { ...res.data, status: res.status };
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
+        console.warn("[Publish Error]", {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message
+        });
         if (
           error?.response?.data?.message === "Token is invalid or has expired!"
         ) {
           Cookies.remove("token");
           Cookies.remove("user");
           router.push("/login");
-          return { message: "Your session was expired. Please log in again." };
+          return { message: "Your session expired. Please sign in again." };
         } else {
-          return { message: "Something went wrong" };
+          // Return the actual error message from backend if available
+          return { message: error.response?.data?.message || "Failed to publish video. Please try again." };
         }
       }
+      console.warn("[Publish Error] Unknown:", error);
       return { message: "An unknown error occurred" };
     } finally {
       setLoading(false);
@@ -868,11 +876,29 @@ const useVideo = () => {
       setLoading(false);
     }
   };
+
+  // Get random video for /watch landing
+  const getRandomVideo = async (): Promise<any> => {
+    setLoading(true);
+    try {
+      const res = await axios.get(GETRANDOMVIDEO);
+      return { ...res.data, status: res.status };
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return { message: error?.response?.data?.message || "No videos available" };
+      }
+      return { message: "An unknown error occurred" };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     publish,
     deleteVideo,
     getVideos,
     getHomeVideos,
+    getRandomVideo,
     addLike,
     getMyVideos,
     getUserVideos,

@@ -5,6 +5,7 @@ export function useVideoValidate() {
   const [file, setFile] = useState<File | null>(null);
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const [duration, setDuration] = useState<number>(0);
+  const [isVertical, setIsVertical] = useState<boolean>(false);
 
   function validateVideo(e: React.ChangeEvent<HTMLInputElement>) {
     setError(""); // Reset error at the beginning
@@ -55,6 +56,8 @@ export function useVideoValidate() {
       }
       setDuration(video.duration);
       setFile(file);
+      // Detect vertical video (height > width)
+      setIsVertical(video.videoHeight > video.videoWidth);
     };
   }
   // Cancel local video
@@ -62,6 +65,7 @@ export function useVideoValidate() {
     setFile(null);
     setVideoSrc("");
     setError("");
+    setIsVertical(false);
   };
 
   return {
@@ -71,5 +75,6 @@ export function useVideoValidate() {
     uploadedFile: file,
     videoSrc,
     fileDuration: duration,
+    isVertical,
   };
 }

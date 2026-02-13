@@ -63,6 +63,56 @@ export const getHomeVideos = expressAsyncHandler(
   }
 );
 
+// Get random video for /watch landing
+export const getRandomVideo = expressAsyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    try {
+      // Get count of all videos
+      const count = await Video.countDocuments({});
+      if (count === 0) {
+        res.status(404).json({ message: "No videos available." });
+        return;
+      }
+
+      // Get a random video
+      const random = Math.floor(Math.random() * count);
+      const randomVideo = await Video.findOne({})
+        .skip(random)
+        .select("videoLink title description info duration userId _id isVertical")
+        .populate<{ cards: ICard[] }>("cards")
+        .populate("user")
+        .lean();
+
+      if (!randomVideo) {
+        res.status(404).json({ message: "Video not found." });
+        return;
+      }
+
+      // Get user info
+      const userInfo = await User.findById(randomVideo.userId)
+        .select("totalVideos userName picture")
+        .lean();
+
+      // Process cards for non-authenticated users
+      if (randomVideo?.cards) {
+        randomVideo.cards.forEach((card: ICard) => {
+          card.isSaved = false;
+          card.savers = [];
+        });
+      }
+
+      res.status(200).json({
+        message: "Random video found.",
+        videoInfo: randomVideo,
+        userInfo,
+      });
+    } catch (error: any) {
+      console.log("getRandomVideo", error);
+      res.status(500).json({ message: error.message });
+    }
+  }
+);
+
 // Get video detail
 export const getVideo = expressAsyncHandler(
   async (req: CustomRequest, res: Response) => {

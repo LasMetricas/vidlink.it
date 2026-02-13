@@ -17,7 +17,7 @@ const FileUpload: React.FC<Type> = ({
 }) => {
   return (
     <>
-      <div className="h-[500px] flex justify-center items-center rounded-[23px] bg-[#1E1E1E] mt-[78px] relative">
+      <div className="h-[200px] flex justify-center items-center rounded-[23px] bg-[#1E1E1E] mt-[70px] relative">
         {!error ? (
           <>
             <label htmlFor="upload" className="h-[128px]  mb-[26.36px]">
@@ -27,14 +27,17 @@ const FileUpload: React.FC<Type> = ({
                 } gap-[8px] duration-500 flex flex-col items-center`}
               >
                 <img
-                  className="size-[86px]"
+                  className="size-[50px]"
                   src="/icon/desktop/upload/file.png"
                   loading="eager"
                   alt=""
                 />
-                <div className="border-[2px] border-white rounded-[5px] text-[25px] font-semibold px-[5px] ">
+                <div className="border-[2px] border-white rounded-[5px] text-[20px] font-semibold px-[5px]">
                   BROWSE FILE
                 </div>
+                <p className="text-[12px] text-[#888] mt-1 text-center">
+                  For TikTok or Instagram, download the video first and upload here
+                </p>
               </div>
               <img
                 className={`${

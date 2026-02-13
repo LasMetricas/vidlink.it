@@ -23,7 +23,7 @@ const VideoItem: React.FC<Type> = ({
   return (
     <>
       <li className="w-full flex flex-col items-center gap-[20px] justify-between">
-        <div className="h-[281px] w-full rounded-[8.37px] overflow-hidden">
+        <div className="aspect-video w-full rounded-[8.37px] overflow-hidden bg-[#1a1a1a]">
           {src !== "" ? (
             <Link
               href={`/videos/${videoId}`}
@@ -42,7 +42,7 @@ const VideoItem: React.FC<Type> = ({
                       style: {
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover",
+                        objectFit: "contain",
                       },
                     },
                   },

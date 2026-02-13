@@ -8,6 +8,7 @@ export const DELETEVIDEO = `${BASE_URL}/express/video/delete/`; // video delete
 export const GETVIDEOS = `${BASE_URL}/express/video/getvideos/`; // get videos
 export const GETHOMEVIDEOS = `${BASE_URL}/express/video/gethomevideos/`; // get homepage videos
 export const GETVIDEO = `${BASE_URL}/express/video/getvideo/`; // get a video
+export const GETRANDOMVIDEO = `${BASE_URL}/express/video/getrandomvideo/`; // get random video for /watch
 export const GETEDITVIDEO = `${BASE_URL}/express/video/geteditvideo/`; // get a edit video
 export const GETMYVIDEO = `${BASE_URL}/express/video/getmyvideo/`; // get my video
 export const ADDLIKE = `${BASE_URL}/express/video/addlike/`; // get video

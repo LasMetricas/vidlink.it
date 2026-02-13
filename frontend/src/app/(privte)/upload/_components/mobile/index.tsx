@@ -8,7 +8,7 @@ import Loading from "@/app/_components/ui/loading";
 import { useAtom } from "jotai";
 import { cardAtom, CardType } from "@/store";
 import useVideo from "@/hooks/useVideo";
-import { getItem, setItem } from "@/utils/localstorage";
+import { getItem, setItem, removeItem } from "@/utils/localstorage";
 import { errorModal } from "@/utils/confirm";
 // import Cookies from "js-cookie";
 const AddCards = dynamic(() => import("./addCards"), { ssr: false });
@@ -97,7 +97,14 @@ const UploadMobile = () => {
       if (draftStatus) setEdit(draftStatus);
       if (duration) setDuration(duration);
     } else {
-      localStorage.clear();
+      // Clear only upload-related data, not auth flags
+      removeItem("cards");
+      removeItem("editStatus");
+      removeItem("onlineVideo");
+      removeItem("editSignal");
+      removeItem("title");
+      removeItem("info");
+      removeItem("duration");
     }
     setHasMounted(true);
   }, []);

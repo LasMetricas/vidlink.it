@@ -1,9 +1,17 @@
 "use client";
-import { isMobile } from "react-device-detect";
-import dynamic from "next/dynamic";
-const HomeDesktop = dynamic(() => import("@/app/_components/root/desktop"));
-const HomeMobile = dynamic(() => import("@/app/_components/root/mobile"));
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  return <>{isMobile ? <HomeMobile /> : <HomeDesktop />}</>;
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/watch");
+  }, [router]);
+
+  return (
+    <div className="h-screen w-full flex items-center justify-center bg-black">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue"></div>
+    </div>
+  );
 }

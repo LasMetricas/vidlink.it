@@ -12,13 +12,14 @@ interface IVideo extends Document {
   card: number;
   watchTime: number;
   draft: boolean;
+  isVertical: boolean;
 }
 
 const VideoSchema = new Schema<IVideo>(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, required: true },
     title: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String, default: "" },
     info: { type: String, required: true },
     duration: { type: Number, required: true },
     videoLink: { type: String, required: true },
@@ -27,6 +28,7 @@ const VideoSchema = new Schema<IVideo>(
     card: { type: Number, default: 0 },
     watchTime: { type: Number, default: 0 },
     draft: { type: Boolean, default: false },
+    isVertical: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

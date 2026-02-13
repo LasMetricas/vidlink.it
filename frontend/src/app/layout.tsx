@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 import ThemeProvider from "@/provider/themeProvider";
 import JotaiProvider from "@/provider/jotaiProvider";
@@ -64,7 +65,28 @@ export default function RootLayout({
             </ThemeProvider>
           </JotaiProvider>
         </ErrorBoundary>
-        <ToastContainer />
+        <ToastContainer
+          theme="dark"
+          position="bottom-center"
+          autoClose={2000}
+          hideProgressBar
+          newestOnTop
+          closeOnClick
+          pauseOnHover={false}
+          toastStyle={{
+            background: 'rgba(0, 0, 0, 0.9)',
+            backdropFilter: 'blur(10px)',
+            border: 'none',
+            borderRadius: '30px',
+            color: '#fff',
+            fontSize: '14px',
+            fontWeight: 500,
+            padding: '12px 24px',
+            minHeight: 'auto',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          }}
+          icon={false}
+        />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>

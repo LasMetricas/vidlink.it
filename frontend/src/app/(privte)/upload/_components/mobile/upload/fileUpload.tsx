@@ -25,17 +25,20 @@ const FileUpload: React.FC<Type> = ({
               <div
                 className={`${
                   videoSrc ? "opacity-0" : "opacity-100"
-                } gap-[8px] duration-500 flex flex-col items-center`}
+                } gap-[6px] duration-500 flex flex-col items-center`}
               >
                 <img
-                  className="size-[50px]"
+                  className="size-[40px]"
                   src="/icon/upload/file.svg"
-                  loading='eager'
+                  loading="eager"
                   alt=""
                 />
-                <div className="border-[1.5px] flex items-center justify-center border-white rounded-[3.2px] text-[14.53px] font-semibold pt-[2px] pb-[0px] px-[2.13px] ">
+                <div className="border-[1.5px] flex items-center justify-center border-white rounded-[3.2px] text-[12px] font-semibold pt-[2px] pb-[0px] px-[2.13px]">
                   BROWSE FILE
                 </div>
+                <p className="text-[8px] text-[#888] text-center px-4">
+                  For TikTok/Instagram: download video first, then upload here
+                </p>
               </div>
               <img
                 className={`${

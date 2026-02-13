@@ -38,6 +38,7 @@ const PreviewVideo: React.FC<Type> = ({
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState<boolean>(false);
   const playingStartedRef = useRef<boolean>(false);
+  const [isVertical, setIsVertical] = useState<boolean>(false);
 
   // Go to selected card start time
   useEffect(() => {
@@ -138,10 +139,36 @@ const PreviewVideo: React.FC<Type> = ({
     return true;
   });
 
+  const handleReady = () => {
+    setIsReady(true);
+    // Detect video aspect ratio
+    if (videoRef.current) {
+      const player = videoRef.current.getInternalPlayer();
+      if (player) {
+        // For HTML5 video
+        if (player.videoWidth && player.videoHeight) {
+          setIsVertical(player.videoHeight > player.videoWidth);
+        }
+        // For YouTube/Vimeo, check after a short delay
+        setTimeout(() => {
+          if (player.videoWidth && player.videoHeight) {
+            setIsVertical(player.videoHeight > player.videoWidth);
+          }
+        }, 500);
+      }
+    }
+  };
+
   return (
     <>
       {videoLink ? (
-        <div className="h-[575px] w-full rounded-[7.36px] overflow-hidden relative">
+        <div
+          className={`rounded-[7.36px] overflow-hidden relative bg-black ${
+            isVertical
+              ? "w-[320px] h-[575px] mx-auto"
+              : "w-full aspect-video max-h-[575px]"
+          }`}
+        >
           <ReactPlayer
             ref={videoRef}
             url={videoLink}
@@ -152,9 +179,7 @@ const PreviewVideo: React.FC<Type> = ({
             playing={playing}
             width="100%"
             height="100%"
-            onReady={() => {
-              setIsReady(true);
-            }}
+            onReady={handleReady}
             onPause={onSeekEnd}
             onPlay={onSeekEnd}
             onStart={() => {
@@ -167,7 +192,7 @@ const PreviewVideo: React.FC<Type> = ({
                   style: {
                     width: "100%",
                     height: "100%",
-                    objectFit: "cover",
+                    objectFit: "contain",
                   },
                 },
               },

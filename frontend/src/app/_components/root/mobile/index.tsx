@@ -1,123 +1,362 @@
 "use client";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { basicBold } from "@/style/fonts/fonts";
-import Footer from "@/app/_components/layout/mobile/footer";
-import { useState } from "react";
-import { Video } from "../../ui/video";
-import Image from "next/image";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import dynamic from "next/dynamic";
+import type ReactPlayerClass from "react-player";
+import useVideo from "@/hooks/useVideo";
+import useVerifyAuth from "@/hooks/useVerifyAuth";
+
+const ReactPlayer = dynamic(() => import("react-player/lazy"), {
+  ssr: false,
+}) as unknown as typeof ReactPlayerClass;
+
+interface CardData {
+  _id: string;
+  link: string;
+  name: string;
+  start: number;
+  no: number;
+  isSaved: boolean;
+}
+
+interface VideoData {
+  _id: string;
+  videoLink: string;
+  title: string;
+  info: string;
+  duration: number;
+  views: number;
+  card: number;
+  user: {
+    _id: string;
+    userName: string;
+    picture: string;
+  };
+}
 
 export default function HomeMobile() {
-  const [isPlay, setIsPLay] = useState<boolean>(false);
-  const videoPlay = () => {
-    setIsPLay(true);
+  const { getHomeVideos } = useVideo();
+  const { isAuth } = useVerifyAuth();
+  const [videos, setVideos] = useState<VideoData[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      const res = await getHomeVideos();
+      if ("homeVideos" in res && res.homeVideos) {
+        // Shuffle videos randomly
+        const shuffled = [...(res.homeVideos as VideoData[])].sort(() => Math.random() - 0.5);
+        setVideos(shuffled);
+      }
+      setLoading(false);
+    };
+    fetchVideos();
+  }, []);
+
+  const handleScroll = () => {
+    if (containerRef.current) {
+      const scrollTop = containerRef.current.scrollTop;
+      const height = window.innerHeight;
+      const newIndex = Math.round(scrollTop / height);
+      if (newIndex !== currentIndex && newIndex < videos.length) {
+        setCurrentIndex(newIndex);
+      }
+    }
   };
 
-  const settings = {
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    vertical: true,
-    autoplay: true,
-    autoplaySpeed: 1000,
-    arrows: false,
-    adaptiveHeight: true,
-  };
-  const images = [
-    { name: "youtube", src: "/icon/home/youtube.png" },
-    { name: "youtube", src: "/icon/home/max.png" },
-    { name: "youtube", src: "/icon/home/spotify.png" },
-    { name: "youtube", src: "/icon/home/wikipedia.png" },
-    { name: "youtube", src: "/icon/home/linkedin.png" },
-    { name: "youtube", src: "/icon/home/imdb.png" },
-  ];
+  if (loading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue"></div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <div className=" relative">
-        <div className="h-screen">
-          {process.env.NEXT_PUBLIC_PRODUCTION === "production" ? (
-            <Video src="/video/main.mp4" />
-          ) : (
-            <Video src="/video/home.mp4" />
-          )}
-        </div>
-        <div className="absolute top-[332px] w-full flex justify-center">
-          <div>
-            <img
-              width={356.54}
-              height={54}
-              className="w-[356.54px] h-[54px]"
-              src="/icon/home/title.png"
-              alt=""
-              loading="eager"
-            />
-            <div className="flex items-center gap-[12.87px] mt-[13px] pl-[17.54px]">
-              <h1 className="text-[15.06px] text-white">
-                CONNECT YOUR VIDEOS TO
-              </h1>
-              <Slider {...settings} className="w-[45px] ">
-                {images.map((item, index) => (
-                  <div key={index}>
-                    <Image width={28.7} height={28.7} className="pt-[2px]" src={item.src} alt="" />
-                  </div>
-                ))}
-              </Slider>
-            </div>
+    <div className="h-screen w-full bg-black overflow-hidden">
+      {/* Sticky Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent pt-2 pb-6 px-4">
+        <div className="flex justify-between items-center">
+          <img src="/icon/layout/title.svg" alt="VidLink" className="h-[20px]" />
+          <div className="flex gap-3">
+            <Link
+              href="/upload"
+              className="bg-blue text-white text-[12px] font-bold px-4 py-2 rounded-full"
+            >
+              CREATE
+            </Link>
+            <Link
+              href="/videos"
+              className="bg-white/20 text-white text-[12px] font-bold px-4 py-2 rounded-full backdrop-blur-sm"
+            >
+              WATCH
+            </Link>
+            {!isAuth && (
+              <Link
+                href="/login"
+                className="bg-white text-black text-[12px] font-bold px-4 py-2 rounded-full"
+              >
+                LOGIN
+              </Link>
+            )}
           </div>
         </div>
-        <div className=" absolute text-[10px] bottom-[37px] left-[20px] right-[20px]">
-          <h1 className="mb-[15.5px] font-bold ">POWERED BY HUMANS</h1>
-          <p className="font-normal leading-[12px] text-justify tracking-normal">
-            WE FILL VIDEOS WITH KNOWLEDGE AND ACTIONS THANKS TO OUR SYNCHRONIZED
-            CARDS. MADE FOR MOVIE LOVERS, DESIGN AFICIONADOS, ADVERTISING PROS,
-            SPORTS ANALYTICS AND FANS OF CASABLANCA...
-          </p>
-        </div>
       </div>
-      <div className="flex flex-col items-center pt-[22px] px-[15.5px]">
-        <h1
-          className={`${basicBold.className} text-[94.5px] w-full text-center max-[393px]:text-[82px]  leading-[85.39px] pb-[28px]`}
+
+      {/* Video Feed */}
+      {videos.length > 0 ? (
+        <div
+          ref={containerRef}
+          className="h-full overflow-y-scroll snap-y snap-mandatory"
+          onScroll={handleScroll}
         >
-          HOW IT WORKS
-        </h1>
-        <div className="flex justify-center items-center  border-white border-[2px] rounded-[9.42px] w-full h-[574px] relative overflow-hidden">
-          {isPlay && (
-            <div className="h-[574px] w-full">
-              {process.env.NEXT_PUBLIC_PRODUCTION === "production" ? (
-                <Video src="/video/main.mp4" />
-              ) : (
-                <Video src="/video/home/home.mp4" />
-              )}
-            </div>
-          )}
-          {isPlay || (
-            <button onClick={videoPlay}>
-              <img
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                src="/icon/home/play.svg"
-                alt=""
-              />
-            </button>
-          )}
+          {videos.map((video, index) => (
+            <VideoCard
+              key={video._id}
+              video={video}
+              isActive={index === currentIndex}
+              isAuth={isAuth}
+            />
+          ))}
         </div>
-        <p className="text-[12px] w-full pt-[21px] px-[5px] text-justify leading-[14.4px]">
-          A tool that allows you to insert content into your favorite videos.
-          Thanks to its non intrusive design you can watch and interact or not.
-          It is easy, clear and a bit surprising. The system is absolutely safe
-          and spam free. Our team of editors curates the content and make sure
-          you don’t click where you should not.
-        </p>
-        <Link
-          href={"/videos"}
-          className="border-[1.5px] border-white rounded-[3.2px] text-[14.91px] py-[1px] px-[2.13px] my-[43px] "
-        >
-          ALL VIDEOS
+      ) : (
+        <div className="h-full flex flex-col items-center justify-center text-white">
+          <p className="text-[18px] mb-4">No videos yet</p>
+          <Link
+            href="/upload"
+            className="bg-blue px-6 py-3 rounded-full font-bold"
+          >
+            Create the first video
+          </Link>
+        </div>
+      )}
+
+      {/* Bottom gradient */}
+      <div className="fixed bottom-0 left-0 right-0 h-[100px] bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+    </div>
+  );
+}
+
+interface VideoCardProps {
+  video: VideoData;
+  isActive: boolean;
+  isAuth: boolean;
+}
+
+function VideoCard({ video, isActive, isAuth }: VideoCardProps) {
+  const videoRef = useRef<ReactPlayerClass | null>(null);
+  const { getVideo, saveCard } = useVideo();
+  const [cards, setCards] = useState<CardData[]>([]);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [activeCard, setActiveCard] = useState<CardData | null>(null);
+  const [cardsFetched, setCardsFetched] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [savedCards, setSavedCards] = useState<Set<string>>(new Set());
+
+  // Update active card based on current time
+  useEffect(() => {
+    if (cards.length === 0) {
+      setActiveCard(null);
+      return;
+    }
+
+    // Find the most recent card that should be showing
+    // Cards with start <= 1 show immediately (first card requirement)
+    const effectiveTime = Math.max(currentTime, 1);
+    const currentCard = cards
+      .filter((card) => card.start <= effectiveTime)
+      .sort((a, b) => b.start - a.start)[0];
+
+    // Card stays visible for 4 seconds after its start time
+    if (currentCard && effectiveTime - currentCard.start <= 4) {
+      setActiveCard(currentCard);
+    } else {
+      setActiveCard(null);
+    }
+  }, [currentTime, cards]);
+
+  // Fetch cards immediately on mount if this is likely the first video
+  useEffect(() => {
+    if (!cardsFetched && video.card > 0) {
+      const fetchCards = async () => {
+        const res = await getVideo(video._id);
+        if ("videoInfo" in res && res.videoInfo?.cards) {
+          setCards(res.videoInfo.cards);
+          const saved = new Set<string>();
+          res.videoInfo.cards.forEach((card) => {
+            if (card.isSaved) saved.add(card._id);
+          });
+          setSavedCards(saved);
+        }
+        setCardsFetched(true);
+      };
+      fetchCards();
+    }
+  }, [video._id, video.card, cardsFetched]);
+
+  const handleProgress = useCallback((state: { playedSeconds: number }) => {
+    setCurrentTime(Math.floor(state.playedSeconds));
+  }, []);
+
+  return (
+    <div className="h-screen w-full snap-start relative bg-black overflow-hidden">
+      {/* Video Player - Always full screen, plays inline */}
+      <div className="absolute inset-0 pointer-events-none [&>div]:!absolute [&>div]:!inset-0 [&>div>div]:!w-full [&>div>div]:!h-full [&_video]:!object-cover [&_video]:!w-full [&_video]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150">
+        <ReactPlayer
+          ref={videoRef}
+          url={video.videoLink}
+          width="100%"
+          height="100%"
+          playing={isActive}
+          loop
+          muted={isMuted}
+          playsinline
+          onProgress={handleProgress}
+          progressInterval={500}
+          style={{ position: 'absolute', top: 0, left: 0 }}
+          config={{
+            youtube: {
+              playerVars: {
+                rel: 0,
+                modestbranding: 1,
+                controls: 0,
+                playsinline: 1,
+                fs: 0,
+                disablekb: 1,
+              }
+            },
+            file: {
+              attributes: {
+                playsInline: true,
+                "webkit-playsinline": "true",
+                autoPlay: true,
+                muted: true,
+                disablePictureInPicture: true,
+                controlsList: "nodownload nofullscreen noremoteplayback",
+              },
+            },
+          }}
+        />
+      </div>
+
+      {/* Floating Card Overlay - Simple Square */}
+      {activeCard && (
+        <div className="absolute bottom-[160px] left-4 z-30 animate-in fade-in slide-in-from-left-4 duration-300">
+          <div className="relative">
+            {/* Main Card - Tap to visit link */}
+            <a
+              href={activeCard.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-[120px] h-[120px] bg-gradient-to-br from-blue to-blue/70 rounded-[16px] p-3 flex flex-col justify-between shadow-lg"
+            >
+              <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-[12px] font-bold">
+                {activeCard.no}
+              </span>
+              <div>
+                <p className="text-[13px] font-semibold leading-tight line-clamp-2">{activeCard.name}</p>
+                <p className="text-[10px] text-white/70 mt-1">Tap to visit</p>
+              </div>
+            </a>
+            {/* Save Button */}
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (!isAuth) {
+                  sessionStorage.setItem("vidlink_return_url", "/");
+                  window.location.href = "/login";
+                  return;
+                }
+                if (activeCard._id && !savedCards.has(activeCard._id)) {
+                  await saveCard(activeCard._id);
+                  setSavedCards(new Set([...savedCards, activeCard._id]));
+                }
+              }}
+              className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-md ${
+                savedCards.has(activeCard._id) ? "bg-blue" : "bg-white"
+              }`}
+            >
+              <svg
+                className={`w-4 h-4 ${savedCards.has(activeCard._id) ? "text-white" : "text-black"}`}
+                fill={savedCards.has(activeCard._id) ? "currentColor" : "none"}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Video Info Overlay */}
+      <div className="absolute bottom-[100px] left-4 right-16 z-20">
+        <Link href={`/profile/${video.user._id}`} className="flex items-center gap-2 mb-2">
+          {video.user.picture ? (
+            <img
+              src={video.user.picture}
+              alt=""
+              className="w-10 h-10 rounded-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gray-600" />
+          )}
+          <span className="font-semibold text-[14px]">{video.user.userName}</span>
+        </Link>
+        <Link href={`/videos/${video._id}`}>
+          <h3 className="text-[16px] font-bold text-blue">{video.title}</h3>
+          {video.info && <p className="text-[13px] text-white/80">{video.info}</p>}
         </Link>
       </div>
-      <Footer isFixed={false} />
-    </>
+
+      {/* Side Actions */}
+      <div className="absolute right-3 bottom-[180px] flex flex-col gap-5 z-20">
+        {/* Mute/Unmute Button */}
+        <button
+          onClick={() => setIsMuted(!isMuted)}
+          className="flex flex-col items-center"
+        >
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+            {isMuted ? (
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+              </svg>
+            )}
+          </div>
+          <span className="text-[10px] mt-1">{isMuted ? "Unmute" : "Mute"}</span>
+        </button>
+        <Link
+          href={`/videos/${video._id}`}
+          className="flex flex-col items-center"
+        >
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+            <span className="text-[12px] font-bold">{video.card}</span>
+          </div>
+          <span className="text-[10px] mt-1">Cards</span>
+        </Link>
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+            <span className="text-[12px] font-bold">{video.views}</span>
+          </div>
+          <span className="text-[10px] mt-1">Views</span>
+        </div>
+      </div>
+
+      {/* Card count indicator - shows when no active card is displayed */}
+      {video.card > 0 && !activeCard && (
+        <div className="absolute bottom-[40px] left-4 right-4 flex justify-center z-20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2">
+            <span className="text-[12px] text-white/70">{video.card} cards in this video</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

@@ -277,6 +277,7 @@ export const increaseClicks = expressAsyncHandler(
     const { cardId } = req.body;
     if (!cardId) {
       res.status(400).json({ message: "No provided card Id." });
+      return;
     }
     try {
       const card = await Card.findById(cardId).select("userId").lean();
@@ -326,7 +327,7 @@ export const watchTime = expressAsyncHandler(
     if (!videoId) {
       res.status(400).json({ message: "No provided videoId." });
     }
-    if (req.userId) {
+    if (!req.userId) {
       return;
     }
     try {
