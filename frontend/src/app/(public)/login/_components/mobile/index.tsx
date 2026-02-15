@@ -127,7 +127,7 @@ const LoginMobile = () => {
           <div className="flex flex-col items-center gap-[20px]">
             <button
               onClick={handleSignin}
-              type="submit"
+              type="button"
               disabled={isLoading}
               className={`flex items-center justify-center gap-[12.81px] bg-blue rounded-[12.81px] w-[309px] h-[48px] ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
             >

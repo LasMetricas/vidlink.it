@@ -125,14 +125,19 @@ const WatchPage = () => {
 
   // Load next random video
   const loadNextVideo = async () => {
-    setVideoInfo(null);
-    setActiveCard(null);
-    setShowCards(false);
-    const res = await getRandomVideo();
-    if (res.status === 200 && res.videoInfo) {
-      setVideoInfo(res.videoInfo);
-      setUserInfo(res.userInfo);
-      setPlaying(true);
+    try {
+      const res = await getRandomVideo();
+      if (res.status === 200 && res.videoInfo) {
+        setVideoInfo(res.videoInfo);
+        setUserInfo(res.userInfo);
+        setActiveCard(null);
+        setShowCards(false);
+        setCurrentTime(0);
+        setPlaying(true);
+      }
+      // If API returns no video, keep current video playing
+    } catch {
+      // On error, keep current video visible instead of getting stuck
     }
   };
 

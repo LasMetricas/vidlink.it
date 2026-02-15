@@ -130,7 +130,7 @@ const LoginDesktop = () => {
           <div className="flex flex-col items-center gap-[20px]">
             <button
               onClick={handleSignin}
-              type="submit"
+              type="button"
               disabled={isLoading}
               className={`bg-blue rounded-[12px] uppercase text-[29px] w-[531px] h-[79px] tracking-wider flex flex-wrap items-center gap-[12px] justify-center ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
             >
