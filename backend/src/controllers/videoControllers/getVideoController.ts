@@ -321,10 +321,10 @@ export const getMyVideos = expressAsyncHandler(
           "totalVideos totalCards followers following tiktok youtube linkedin instagram userName picture bio"
         )
         .lean();
-      const followerNumber = userInfo?.followers.filter(
+      const followerNumber = userInfo?.followers?.filter(
         (key) => key.create
-      ).length;
-      const followingNumber = userInfo?.following?.length;
+      )?.length || 0;
+      const followingNumber = userInfo?.following?.length || 0;
       res.status(200).json({
         message: "my videos found",
         myVideos,
