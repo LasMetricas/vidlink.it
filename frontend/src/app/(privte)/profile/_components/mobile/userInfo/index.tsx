@@ -59,9 +59,9 @@ const Index: React.FC<Type> = ({
         </div>
         <div className="text-center text-[13px]">{bio}</div>
         <div className="flex flex-col gap-[5.47px] mt-[5px]">
-          <NavBtn name="DASHBOARD" link="dashboard" />
-          <NavBtn name="DRAFTS" link="upload" />
-          <NavBtn name="SETTINGS" link="settings" />
+          <NavBtn name="DASHBOARD" link="/dashboard" />
+          <NavBtn name="DRAFTS" link="/upload" />
+          <NavBtn name="SETTINGS" link="/settings" />
           <button
             onClick={handleSignOut}
             className="h-[28.88px] bg-[#002355] rounded-[4.97px] flex items-center py-[2px]  justify-center text-[10.5px] font-semibold"

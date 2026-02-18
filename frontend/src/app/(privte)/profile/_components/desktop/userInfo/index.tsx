@@ -66,17 +66,17 @@ const Profile: React.FC<Type> = ({
         <div className="flex flex-wrap gap-[15px] mb-[32px]">
           <NavBtn
             name="SETTINGS"
-            link="settings"
+            link="/settings"
             className="hover:bg-[#9ea6b1] bg-[#B1B9C6]"
           />
           <NavBtn
             name="DASHBOARD"
-            link="dashboard"
+            link="/dashboard"
             className="hover:bg-[#0052cc] bg-blue"
           />
           <NavBtn
             name="DRAFTS"
-            link="upload"
+            link="/upload"
             className="hover:bg-[#0052cc] bg-blue"
           />
           <button
