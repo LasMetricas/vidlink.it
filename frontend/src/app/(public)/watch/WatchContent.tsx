@@ -248,7 +248,7 @@ const WatchPage = () => {
         href={card.link}
         target="_blank"
         rel="noopener noreferrer"
-        className={`relative block ${sizeClasses} rounded-2xl bg-gradient-to-br ${colorClass} p-3 border-2 ${isActive ? "border-white shadow-2xl scale-105" : "border-white/30"} hover:scale-105 transition-transform`}
+        className={`relative block ${sizeClasses} rounded-2xl bg-gradient-to-br ${colorClass} p-3 border-2 ${isActive ? "border-white shadow-2xl scale-105" : "border-white/30"} hover:scale-105 transition-transform no-underline`}
       >
         <span className="absolute top-2 left-2 w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-xs font-bold">
           {card.no}
@@ -345,7 +345,7 @@ const WatchPage = () => {
               href={activeCard.link}
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r ${colors[(activeCard.no - 1) % colors.length]} border border-white/20 shadow-lg`}
+              className={`flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r ${colors[(activeCard.no - 1) % colors.length]} border border-white/20 shadow-lg no-underline`}
             >
               {/* Card Number */}
               <div className="w-8 h-8 rounded-full bg-white/25 flex items-center justify-center flex-shrink-0">

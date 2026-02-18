@@ -250,7 +250,7 @@ function VideoCard({ video, isActive, isAuth }: VideoCardProps) {
               href={activeCard.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-[120px] h-[120px] bg-gradient-to-br from-blue to-blue/70 rounded-[16px] p-3 flex flex-col justify-between shadow-lg"
+              className="block w-[120px] h-[120px] bg-gradient-to-br from-blue to-blue/70 rounded-[16px] p-3 flex flex-col justify-between shadow-lg no-underline"
             >
               <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-[12px] font-bold">
                 {activeCard.no}
