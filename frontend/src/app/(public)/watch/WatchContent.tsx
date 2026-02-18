@@ -241,14 +241,14 @@ const WatchPage = () => {
       favicon = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
     } catch {}
 
-    const sizeClasses = size === "small" ? "w-28 h-28" : "w-[140px] h-[140px]";
+    const sizeClasses = size === "small" ? "w-28 h-28 min-w-[112px] min-h-[112px]" : "w-[140px] h-[140px] min-w-[140px] min-h-[140px]";
 
     return (
       <a
         href={card.link}
         target="_blank"
         rel="noopener noreferrer"
-        className={`relative block ${sizeClasses} rounded-2xl bg-gradient-to-br ${colorClass} p-3 border-2 ${isActive ? "border-white shadow-2xl scale-105" : "border-white/30"} hover:scale-105 transition-transform no-underline`}
+        className={`relative block ${sizeClasses} flex-shrink-0 rounded-2xl bg-gradient-to-br ${colorClass} p-3 border-2 ${isActive ? "border-white shadow-xl" : "border-white/30"} hover:border-white transition-colors no-underline`}
       >
         <span className="absolute top-2 left-2 w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-xs font-bold">
           {card.no}
