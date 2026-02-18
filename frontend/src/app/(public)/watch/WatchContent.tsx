@@ -367,34 +367,34 @@ const WatchPage = () => {
         )}
 
         {/* Right Side Actions */}
-        <div className="absolute right-4 bottom-32 flex flex-col gap-4 z-30">
+        <div className="absolute right-3 bottom-36 flex flex-col gap-6 z-30">
           {/* User (video creator) */}
           {user && (
             <button
               onClick={() => router.push(`/profile/${video.userId}`)}
               className="flex flex-col items-center"
             >
-              <div className="w-11 h-11 rounded-full bg-[#333] overflow-hidden border-2 border-white">
+              <div className="w-14 h-14 rounded-full bg-[#333] overflow-hidden border-2 border-white">
                 {user.picture ? (
                   <img src={user.picture} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-lg">
+                  <div className="w-full h-full flex items-center justify-center text-xl">
                     {user.userName?.charAt(0)?.toUpperCase() || "?"}
                   </div>
                 )}
               </div>
-              <span className="text-[10px] mt-1 max-w-[50px] truncate">{user.userName || "User"}</span>
+              <span className="text-[11px] mt-1.5 max-w-[60px] truncate">{user.userName || "User"}</span>
             </button>
           )}
 
           {/* Like */}
           <button className="flex flex-col items-center">
-            <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
             </div>
-            <span className="text-[10px] mt-1">Like</span>
+            <span className="text-[11px] mt-1.5">Like</span>
           </button>
 
           {/* Cards */}
@@ -402,32 +402,32 @@ const WatchPage = () => {
             onClick={() => setShowCards(!showCards)}
             className="flex flex-col items-center"
           >
-            <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
             </div>
-            <span className="text-[10px] mt-1">{video.cards?.length || 0}</span>
+            <span className="text-[11px] mt-1.5">{video.cards?.length || 0}</span>
           </button>
 
           {/* Share */}
           <button className="flex flex-col items-center">
-            <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
               </svg>
             </div>
-            <span className="text-[10px] mt-1">Share</span>
+            <span className="text-[11px] mt-1.5">Share</span>
           </button>
 
           {/* Report */}
           <button className="flex flex-col items-center">
-            <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <span className="text-[10px] mt-1">Report</span>
+            <span className="text-[11px] mt-1.5">Report</span>
           </button>
         </div>
 
